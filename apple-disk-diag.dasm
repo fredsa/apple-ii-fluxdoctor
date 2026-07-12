@@ -1,0 +1,473 @@
+            processor 6502
+            org  1
+
+; --------------------------------------------------
+; Desired start of program execution
+; --------------------------------------------------
+pgmstart    equ  $2000
+PGM_LENGTH  equ  PGM_END - pgmstart
+
+            seg
+            org  pgmstart - 4 ; Subtract 4 bytes for header
+
+; --------------------------------------------------
+; DOS 3.3 binary header (4 bytes)
+; --------------------------------------------------
+            word pgmstart ; Program start address in memory (2 bytes)
+            word PGM_LENGTH ; Program length (2 bytes), must be file size - 4
+
+; --------------------------------------------------
+; ROM address use
+; --------------------------------------------------
+CH          equ  $24
+CV          equ  $25
+
+; --------------------------------------------------
+; Scratch space
+; --------------------------------------------------
+; $06-$09 - Free Space
+SAVEX       equ  $06
+PRINTPTRL   equ  $07
+PRINTPTRH   equ  $08
+
+; $1D-$1E - Free Space
+FOUND_TRACK equ  $1D
+FOUND_SECT  equ  $1E
+
+; $CE-$CF - Free Space
+
+; $D7     - Free Space
+TEMP1       equ  $D7
+
+; $E3     - Free Space
+
+; $EB-$EF - Free Space
+
+; $FA-$FE - Free Space
+
+; $0200 - $02FF - GETLN Line Input Buffer
+
+; $0300 - $03CF - Free Space for Machine Language, Shape Table, etc.
+
+; $0400 - $07FF - Text Video Page and Peripheral Screenholes
+
+; $0800 - $0BFF - Text Video Page 2 or Applesoft Program and Variables
+
+; $0C00 - $1FFF - Free Space for Machine Language, Shapes, etc.
+DISK_BUFFER equ  $0c00 ; $c00-$cff 256 bytes
+
+; $2000 - $3FFF -  High Resolution Graphics Page 1
+
+; $4000 - $5FFF -  High Resolution Graphics Page 2
+
+; $6000 - $95FF -  Applesoft String Data
+
+; --------------------------------------------------
+; ROM vectors
+; --------------------------------------------------
+BRKV        equ  $03f0 ; new vector for BRK
+SOFTEV      equ  $03f2 ; vector for warm start
+PWREDUP     equ  $03f4 ; this must = EOR #$A5 of SOFTEV+1
+
+; --------------------------------------------------
+; ROM routines
+; --------------------------------------------------
+HOME        equ  $FC58
+COUT        equ  $FDED
+CROUT       equ  $FD8E
+WAIT        equ  $FCA8
+
+; --------------------------------------------------
+; DOS routines
+; --------------------------------------------------
+RWTS        equ  $3D9
+
+
+; --------------------------------------------------
+; IOB table
+; --------------------------------------------------
+DISK_IOB    equ  $B7E8 ; IOB type indicator, must be $01
+DISK_SLOT   equ  $B7E9 ; Slot << 4
+DISK_DRIVE  equ  $B7EA
+DISK_VOL    equ  $B7EB ; Volume $01 - $FE, $00 = any
+DISK_TRACK  equ  $B7EC
+DISK_SECTOR equ  $B7ED
+;                $B7EE ; Low-order byte of device characteristic table (DCT)
+;                $B7EF ; High-order byte of DCT
+DISK_BUFFPTR equ $B7F0 ; data buffer pointer
+;                $B7F1
+;                $B7F2 ; Not used
+;                $B7F3 ; Not used
+DISK_CMD    equ  $B7F4 ; Command
+DISK_ERR    equ  $B7F5 ; Error code (or last byte of bufer read in)
+;                $B7F6 ; Actual volume
+OSLOT       equ  $B7F7 ; Prev slot
+ODRIV       equ  $B7F8 ; Prev drive
+
+DISK_CMD_SEEK equ $00
+DISK_CMD_READ equ $01
+DISK_CMD_WRITE equ $02
+DISK_CMD_FORMAT equ $04
+
+DISK_ERR_NONE equ $00 ; No errors
+DISK_ERR_INIT equ $08 ; Error during initialization
+DISK_ERR_WP equ  $10  ; Write protect error
+DISK_ERR_VOL equ $20  ; Volume mismatch error
+DISK_ERR_DRIVE equ $40 ; Drj.ve error
+DISK_ERR_READ equ $80 ; Read error (obsolete)
+
+; --------------------------------------------------
+; Device characteristics table
+; --------------------------------------------------
+; Offset 00  Device type: $OO = Disk II
+; Offset 01  Phases per track: $01 = DISK II
+; Offset 02  Motor on time count: $EFD8 = DISK II
+
+; --------------------------------------------------
+; Hardware registers
+; --------------------------------------------------
+PHASEOFF    equ  $C080 ; Stepper motor phase 0 off
+PHASEON     equ  $C081 ; Stepper motor phase 0 on
+PHASE1OFF   equ  $C082 ; Stepper motor phase 1 off
+PHASElON    equ  $C083 ; Stepper motor phase I on
+PHASE2OFF   equ  $C084 ; Stepper motor phase 2 off
+PHASE2ON    equ  $C085 ; Stepper notor phase 2 on
+PHASE3OFF   equ  $C086 ; Stepper motor phase 3 off
+PHASE3ON    equ  $C087 ; Stepper motor phase 3 on
+MOTOROFF    equ  $C088 ; Turn motor off
+MOTORON     equ  $C089 ; Turn motor on
+DRV0EN      equ  $C08A ; Drive 0 select
+DRV1EN      equ  $C08B ; Drive 1 select
+Q6L         equ  $C08C ; READ data latch
+Q6H         equ  $C08D ; WRITE data latch; read write protect state
+Q7L         equ  $C08E ; Set READ mode
+Q7H         equ  $C08F ; Set WRITE mode
+; Q7L Q6L = Read data
+; Q7H Q6L = Write data
+; Q7L Q6H = Sense Write Protect
+; Q7H Q6H = Load Write Latch
+
+; --------------------------------------------------
+; Low level disk layout
+; --------------------------------------------------
+; Address field: D5 AA 96 {2:VOL} {2:TRACK} {2:SECT} {2:CHKSUM} DE AA EB
+; Data field   : D5 AA AD {342:DATA}                 {2:CHKSUM} DE AA EB
+FIELD0      equ  $D5
+FIELD1      equ  $AA
+FIELD2_ADDR equ  $96
+FIELD2_DATA equ  $AD
+
+; --------------------------------------------------
+; Macros
+; --------------------------------------------------
+            mac  print
+.strname    equ  {1}
+            lda  #<.strname
+            sta  PRINTPTRL
+            lda  #>.strname
+            sta  PRINTPTRH
+            ldy  #$ff
+.next       iny
+            lda  (PRINTPTRL),y
+            beq  .done
+            ora  #$80
+            jsr  COUT
+            jmp  .next
+.done
+            endm
+
+            mac  readbyte
+            ; Just one byte
+.readbyte   lda  Q6L,x ; read byte
+            bpl  .readbyte
+            endm
+
+
+; --------------------------------------------------
+; Start of program
+; --------------------------------------------------
+pgmstart
+            ; --------------------------------------------------
+            ; Clear screen
+            ; --------------------------------------------------
+            jsr  HOME
+            jsr  CROUT
+
+            ; --------------------------------------------------
+            ; Init
+            ; --------------------------------------------------
+            jsr  setupiob
+
+            ; --------------------------------------------------
+            ; Display write protect stats
+            ; --------------------------------------------------
+            ldx  DISK_SLOT
+            lda  Q6H,x ; Sense WP
+            LDA  Q7L,x ; Sense WP
+            bmi  write_protected
+            print t_write_enabled
+            jmp  end_write_protect
+write_protected
+            print t_write_protected
+end_write_protect
+            jsr  CROUT
+
+            ; --------------------------------------------------
+            ; Display track
+            ; --------------------------------------------------
+            print t_track
+            lda  #3
+            sta  DISK_TRACK
+            jsr  printhex
+            jsr  CROUT
+            jsr  CROUT
+            jsr  CROUT
+            jsr  CROUT
+            jsr  CROUT
+
+            ; --------------------------------------------------
+            ; Placeholders for all sectors
+            ; --------------------------------------------------
+            ldx  #15  ; sector map offset
+            stx  sectoffset
+nextplaceholder
+            lda  sects_appledos,x
+            jsr  touchsect
+            dec  sectoffset
+            ldx  sectoffset
+            bne  nextplaceholder
+
+            ; --------------------------------------------------
+            ; Seek to desired track
+            ; --------------------------------------------------
+            print t_seeking
+            jsr  seek
+
+;             ; --------------------------------------------------
+;             ; Read all sectors using RWTS
+;             ; --------------------------------------------------
+;             ldx  #$0  ; sector map offset
+;             stx  sectoffset
+; nextsect    lda  sects_appledos,x
+;             sta  DISK_SECTOR ; desired sector
+
+;             ; print sector
+;             jsr  printnibble
+;             lda  #' |$80
+;             jsr  COUT
+
+;             ; read sector
+;             jsr  readsect
+
+;             lda  #', | $80
+;             jsr  COUT
+;             lda  #'  | $80
+;             jsr  COUT
+;             lda  DISK_SECTOR
+;             jsr  touchsect
+
+;             ; next sector
+;             ldx  sectoffset
+;             inx
+;             stx  sectoffset
+;             cpx  #16
+;             bmi  nextsect
+
+
+            ; --------------------------------------------------
+            ; Free wheeling
+            ; --------------------------------------------------
+            ldx  DISK_SLOT
+            LDA  DRV0EN,x
+            lda  MOTORON,x
+            lda  Q7L,x ; read mode
+
+            ; Wait for motor to spin up
+            ldy  #10
+waitmore    jsr  WAIT
+            dey
+            bne  waitmore
+
+            print t_scanning
+
+
+readbyteloop
+            ; Restore X
+            ldx  DISK_SLOT
+readbyte0
+            readbyte
+chkbyte0    cmp  #FIELD0
+            bne  readbyte0
+
+readbyte1
+            readbyte
+            cmp  #FIELD1
+            bne  chkbyte0
+
+readbyte2
+            readbyte
+            cmp  #FIELD2_ADDR
+            bne  chkbyte0
+
+            readbyte  ; Volume
+            readbyte
+
+            readbyte  ; Track
+            readbyte
+
+            readbyte  ; Sector
+
+            rol
+            sta  FOUND_SECT
+            readbyte
+            and  FOUND_SECT
+            sta  FOUND_SECT
+
+            ; lda  FOUND_SECT
+            ; and  #$0f
+            ; jsr  printhex
+            ; lda  #' |$80
+            ; jsr  COUT
+
+            lda  FOUND_SECT
+            and  #$0f
+            jsr  touchsect
+
+            jmp  readbyteloop
+            ; jmp  pgmstart
+            ; rts
+
+
+; --------------------------------------------------
+; Helpers
+; --------------------------------------------------
+touchsect   tax
+            tay
+            lda  sects_appledos,y
+            tay
+            txa
+            asl
+            adc  #2
+            tax
+            lda  hexchars,y
+            ora  #$80
+            and  #$bf
+            cmp  $0600,x
+            bne  endtouchsect
+            eor  #$80
+endtouchsect
+            sta  $0600,x
+            rts
+
+printnibble
+            stx  SAVEX
+            pha
+            and  #$0f
+            tax
+            lda  hexchars,x
+            ora  #$80
+            jsr  COUT
+            pla
+            ldx  SAVEX
+            rts
+
+printhex
+            stx  SAVEX
+            pha
+            lda  #'$ | $80
+            jsr  COUT
+            pla
+            pha
+            and  #$f0
+            lsr
+            lsr
+            lsr
+            lsr
+            tax
+            lda  hexchars,x
+            ora  #$80
+            jsr  COUT
+            pla
+            pha
+            and  #$0f
+            tax
+            lda  hexchars,x
+            ora  #$80
+            jsr  COUT
+            pla
+            ldx  SAVEX
+            rts
+
+; --------------------------------------------------
+; Disk II
+; --------------------------------------------------
+setupiob
+            lda  #$01
+            sta  DISK_IOB
+
+            lda  #$00
+            sta  DISK_VOL
+
+            lda  #$60 ; Slot 6
+            sta  DISK_SLOT
+
+            lda  #$01 ; Drive
+            sta  DISK_DRIVE
+            rts
+
+seek
+            lda  #DISK_CMD_SEEK
+            sta  DISK_CMD
+            lda  #>DISK_IOB
+            ldy  #<DISK_IOB
+            jsr  RWTS
+            jmp  checkerr
+
+readsect
+            lda  #DISK_CMD_READ
+            sta  DISK_CMD
+
+            lda  #<DISK_BUFFER
+            sta  DISK_BUFFPTR
+            lda  #>DISK_BUFFER
+            sta  DISK_BUFFPTR+1
+
+            lda  #>DISK_IOB
+            ldy  #<DISK_IOB
+            jsr  RWTS
+            jmp  checkerr
+
+checkerr
+            bcs  diskerr
+            print t_ok
+            jmp  enddiskerr
+diskerr
+            print t_err
+            lda  DISK_ERR
+            jsr  printhex
+enddiskerr
+            lda  #$0D | $80
+            jsr  COUT
+            rts
+
+
+; --------------------------------------------------
+; Messages
+; --------------------------------------------------
+t_track     byte "TRACK ",0
+t_write_protected byte "WRITE PROTECTED",0
+t_write_enabled byte "WRITE ENABLED",0
+t_ok        byte "OK",0
+t_err       byte "ERR ",0
+t_scanning  byte "SCANNING...",0
+t_seeking   byte "SEEKING...",0
+
+; --------------------------------------------------
+; Data
+; --------------------------------------------------
+hexchars    byte "0123456789ABCDEF"
+sects_appledos byte 0,13,11,9,7,5,3,1,14,12,10,8,6,4,2,15
+sectoffset  byte
+
+PGM_END
+; Don't add instructions after this line
