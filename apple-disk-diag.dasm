@@ -35,6 +35,7 @@ FOUND_TRACK equ  $1D
 FOUND_SECT  equ  $1E
 
 ; $CE-$CF - Free Space
+FOUND_VOLUME equ $CE
 
 ; $D7     - Free Space
 TEMP1       equ  $D7
@@ -72,10 +73,11 @@ PWREDUP     equ  $03f4 ; this must = EOR #$A5 of SOFTEV+1
 ; --------------------------------------------------
 ; ROM routines
 ; --------------------------------------------------
+VTAB        equ  $FC22
 HOME        equ  $FC58
+WAIT        equ  $FCA8
 COUT        equ  $FDED
 CROUT       equ  $FD8E
-WAIT        equ  $FCA8
 
 ; --------------------------------------------------
 ; DOS routines
@@ -126,6 +128,8 @@ DISK_ERR_READ equ $80 ; Read error (obsolete)
 ; --------------------------------------------------
 ; Hardware registers
 ; --------------------------------------------------
+KBD         equ  $C000
+KBDSTRB     equ  $C010
 PHASEOFF    equ  $C080 ; Stepper motor phase 0 off
 PHASEON     equ  $C081 ; Stepper motor phase 0 on
 PHASE1OFF   equ  $C082 ; Stepper motor phase 1 off
@@ -156,6 +160,12 @@ FIELD0      equ  $D5
 FIELD1      equ  $AA
 FIELD2_ADDR equ  $96
 FIELD2_DATA equ  $AD
+
+; --------------------------------------------------
+; Keyboard scan codes
+; --------------------------------------------------
+KBD_LEFT    equ  $08
+KBD_RIGHT   equ  $15
 
 ; --------------------------------------------------
 ; Macros
@@ -199,48 +209,19 @@ pgmstart
             jsr  setupiob
 
             ; --------------------------------------------------
-            ; Display write protect stats
-            ; --------------------------------------------------
-            ldx  DISK_SLOT
-            lda  Q6H,x ; Sense WP
-            LDA  Q7L,x ; Sense WP
-            bmi  write_protected
-            print t_write_enabled
-            jmp  end_write_protect
-write_protected
-            print t_write_protected
-end_write_protect
-            jsr  CROUT
-
-            ; --------------------------------------------------
             ; Display track
             ; --------------------------------------------------
-            print t_track
-            lda  #3
-            sta  DISK_TRACK
-            jsr  printhex
-            jsr  CROUT
-            jsr  CROUT
-            jsr  CROUT
-            jsr  CROUT
-            jsr  CROUT
+            jsr  showtrack
 
-            ; --------------------------------------------------
-            ; Placeholders for all sectors
-            ; --------------------------------------------------
-            ldx  #15  ; sector map offset
-            stx  sectoffset
-nextplaceholder
-            lda  sects_appledos,x
-            jsr  touchsect
-            dec  sectoffset
-            ldx  sectoffset
-            bne  nextplaceholder
+            jsr  CROUT
+            jsr  CROUT
+            jsr  CROUT
+            jsr  CROUT
+            jsr  CROUT
 
             ; --------------------------------------------------
             ; Seek to desired track
             ; --------------------------------------------------
-            print t_seeking
             jsr  seek
 
 ;             ; --------------------------------------------------
@@ -277,23 +258,15 @@ nextplaceholder
             ; --------------------------------------------------
             ; Free wheeling
             ; --------------------------------------------------
-            ldx  DISK_SLOT
+freewheelloop
+            inc  $0400 ; alive indicator
+
+            ldx  DISK_SLOT ; Restore X
+
             LDA  DRV0EN,x
-            lda  MOTORON,x
+            lda  MOTORON,x ; motor on
+
             lda  Q7L,x ; read mode
-
-            ; Wait for motor to spin up
-            ldy  #10
-waitmore    jsr  WAIT
-            dey
-            bne  waitmore
-
-            print t_scanning
-
-
-readbyteloop
-            ; Restore X
-            ldx  DISK_SLOT
 readbyte0
             readbyte
 chkbyte0    cmp  #FIELD0
@@ -310,37 +283,104 @@ readbyte2
             bne  chkbyte0
 
             readbyte  ; Volume
+            rol
+            sta  FOUND_VOLUME
             readbyte
+            and  FOUND_VOLUME
+            sta  FOUND_VOLUME
 
             readbyte  ; Track
+            rol
+            sta  FOUND_TRACK
             readbyte
+            and  FOUND_TRACK
+            sta  FOUND_TRACK
 
             readbyte  ; Sector
-
             rol
             sta  FOUND_SECT
             readbyte
             and  FOUND_SECT
+            and  #$0f
             sta  FOUND_SECT
 
-            ; lda  FOUND_SECT
-            ; and  #$0f
-            ; jsr  printhex
-            ; lda  #' |$80
-            ; jsr  COUT
-
+            jsr  showfoundvolume
+            jsr  showfoundtrack
+            jsr  showfoundsector
             lda  FOUND_SECT
             and  #$0f
             jsr  touchsect
 
-            jmp  readbyteloop
-            ; jmp  pgmstart
-            ; rts
+            ; --------------------------------------------------
+            ; Handle key press
+            ; --------------------------------------------------
+            lda  KBD
+            bpl  nokey
+            sta  KBDSTRB
+            and  #$7f
 
+            cmp  #KBD_LEFT
+            bne  noleft
+            lda  DISK_TRACK
+            cmp  #0   ;lowest track
+            beq  noleft
+            dec  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+noleft
+
+            cmp  #KBD_RIGHT
+            bne  noright
+            lda  DISK_TRACK
+            cmp  #34  ; highest track
+            beq  noright
+            inc  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+noright
+
+nokey
+
+            jsr  showwp
+            jmp  freewheelloop
+
+
+; --------------------------------------------------
+; Display write protect stats
+; --------------------------------------------------
+showwp      lda  #$10
+            sta  CV
+            jsr  VTAB
+            lda  #$00
+            sta  CH
+            ldx  DISK_SLOT
+            lda  Q6H,x ; Sense WP
+            LDA  Q7L,x ; Sense WP
+            bmi  write_protected
+            print t_write_enabled
+            jmp  end_write_protect
+write_protected
+            print t_write_protected
+end_write_protect
+            jsr  CROUT
+            rts
 
 ; --------------------------------------------------
 ; Helpers
 ; --------------------------------------------------
+clearsect   ldy  #15
+clearsectloop
+            tya
+            asl
+            adc  #2
+            tax
+            lda  #'_ | $80
+            sta  $0600,x
+            dey
+            bpl  clearsectloop
+endclearsect
+            rts
+
 touchsect   tax
             tay
             lda  sects_appledos,y
@@ -398,6 +438,49 @@ printhex
             ldx  SAVEX
             rts
 
+showtrack
+            lda  #$02
+            sta  CV
+            jsr  VTAB
+            lda  #$00
+            sta  CH
+            print t_target_track
+            lda  DISK_TRACK
+            jsr  printhex
+            rts
+
+showfoundvolume
+            lda  #$06
+            sta  CV
+            jsr  VTAB
+            lda  #$00
+            sta  CH
+            print t_volume
+            lda  FOUND_VOLUME
+            jsr  printhex
+
+showfoundtrack
+            lda  #$07
+            sta  CV
+            jsr  VTAB
+            lda  #$00
+            sta  CH
+            print t_track
+            lda  FOUND_TRACK
+            jsr  printhex
+
+showfoundsector
+            lda  #$08
+            sta  CV
+            jsr  VTAB
+            lda  #$00
+            sta  CH
+            print t_sector
+            lda  FOUND_SECT
+            jsr  printhex
+
+
+
 ; --------------------------------------------------
 ; Disk II
 ; --------------------------------------------------
@@ -421,7 +504,12 @@ seek
             lda  #>DISK_IOB
             ldy  #<DISK_IOB
             jsr  RWTS
-            jmp  checkerr
+            bcs  seekerr
+            php
+            jsr  showtrack
+            jsr  clearsect
+            plp
+seekerr     jmp  checkerr
 
 readsect
             lda  #DISK_CMD_READ
@@ -438,29 +526,25 @@ readsect
             jmp  checkerr
 
 checkerr
-            bcs  diskerr
-            print t_ok
-            jmp  enddiskerr
+            bcc  nodiskerr
 diskerr
             print t_err
             lda  DISK_ERR
             jsr  printhex
-enddiskerr
-            lda  #$0D | $80
-            jsr  COUT
+nodiskerr
             rts
 
 
 ; --------------------------------------------------
 ; Messages
 ; --------------------------------------------------
-t_track     byte "TRACK ",0
+t_target_track byte "TARGET TRACK ",0
 t_write_protected byte "WRITE PROTECTED",0
-t_write_enabled byte "WRITE ENABLED",0
-t_ok        byte "OK",0
+t_write_enabled byte "WRITE ENABLED  ",0
 t_err       byte "ERR ",0
-t_scanning  byte "SCANNING...",0
-t_seeking   byte "SEEKING...",0
+t_volume    byte "VOLUME ",0
+t_track     byte "TRACK  ",0
+t_sector     byte "SECTOR ",0
 
 ; --------------------------------------------------
 ; Data
