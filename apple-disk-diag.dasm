@@ -232,13 +232,11 @@ KBD_RIGHT   equ  $15
             endm
 
             mac  readbyte
-            ; Just one byte
 .readbyte   lda  Q6L,x ; read byte
             bpl  .readbyte
             endm
 
             mac  readbyte_y
-            ; Just one byte
 .readbyte   ldy  Q6L,x ; read byte
             bpl  .readbyte
             endm
@@ -303,6 +301,7 @@ prodosdrive sta  DISK_DRIVE
             jmp  endprevdevice
 notprodos
 
+            ; DOS 3.3 relocation with different amounts of RAM
             ; 48KB  $03D0: JMP 9DBF; JMP 9D84; $AA6A=06 $AA68=01
             ; 32KB  $03D0: JMP 5DBF; JMP 5D84; $6A6A=06 $6A68=01
             ; 16KB  $03D0: JMP 1DBF; JMP 1D84; $2A6A=06 $2A68=01
