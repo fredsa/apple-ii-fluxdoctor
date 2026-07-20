@@ -1054,47 +1054,5 @@ text_rows
             word $428,$4a8,$528,$5a8,$628,$6a8,$728,$7a8 ; row 8-15
             word $450,$4d0,$550,$5d0,$650,$6d0,$750,$7d0 ; row 16-23
 
-; PAGE
-; ; ***************************
-; ; * 7-BIT TO 6-BIT *
-; ; * 'DENIBLIZE' TABL *
-; ; * (16-SECTOR FORMAT) *
-; ; * *
-; ; * VALID CODES *
-; ; * $96 TO $FF ONLY. *
-; ; * *
-; ; * *
-; ; * CODES WITH MORE THAN *
-; ; * ONE PAIR OF ADJACENT *
-; ; * ZEROES OR WITH NO *
-; ; * ADJACENT ONES (EXCEPT *
-; ; * BIT 7) ARE EXCLUDED. *
-; ; * *
-; ; * THIS TABLE *MUST* BE *
-; ; * ALIGNED AT THE END OF *
-; ; * A PAGE IN MEMORY!!! *
-; ***************************
-; XP          EQU  <*   ;CURRENT PAGE ADDRESS
-; DNIBL       EQU  256*XP ;DNIBL TABLE PAGE
-
-; PAGE
-; ; ***************************
-; ; * *
-; ; * NYBBLE BUFFERS *
-; ; * *
-; ; * NBUF1 (256 BYTES) MUST *
-; ; * BE ALIGNED ON A PAGE *
-; ; * BOUNDARY. *
-; ; * *
-; ; * NBUF2 (86 BYTES) MUST *
-; ; * BE ALIGNED ON A PAGE *
-; ; * BOUNDARY. *
-; ; * *
-; ; ***************************
-; *
-; NBUF1       DS   256,0 ;NBUF1
-; NBUF2       DS   86,0 ;NBUF2
-
-
 PGM_END
 ; Don't add instructions after this line
