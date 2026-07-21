@@ -967,7 +967,7 @@ endfixtrack
 ; --------------------------------------------------
 M_SLOT_DRIVE
             byte $00, $00 ; ypos,xpos
-            byte "SLOT _   DRIVE _ _",13
+            byte "SLOT _   DRIVE _ :",13
             byte 0
 SLOT_ADDR   equ  $0405
 DRIVE_ADDR  equ  $040f
@@ -1050,11 +1050,10 @@ M_BYE
 ; Data
 ; --------------------------------------------------
 spinnerchars
-            byte ': | $80
             byte '/ | $80
             byte '- | $80
             byte '\ | $80
-            byte '" | $80
+            byte ': | $80
 hexchars    byte '0 & $3F, '1 & $3F, '2 & $3F, '3 & $3F
             byte '4 & $3F, '5 & $3F, '6 & $3F, '7 & $3F
             byte '8 & $3F, '9 & $3F, 'A & $3F, 'B & $3F
