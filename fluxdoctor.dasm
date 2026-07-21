@@ -395,37 +395,6 @@ prepmap2    lda  dos33_6and2,y
             printmessageinv M_TITLE
 
 
-;             ; --------------------------------------------------
-;             ; Read all sectors using RWTS
-;             ; --------------------------------------------------
-;             ldx  #$0  ; sector map offset
-;             stx  sectoffset
-; nextsect    lda  sects_appledos,x
-;             sta  DISK_SECTOR ; desired sector
-
-;             ; print sector
-;             jsr  printnibble
-;             lda  #' |$80
-;             jsr  COUT
-
-;             ; read sector
-;             jsr  readsect
-
-;             lda  #', | $80
-;             jsr  COUT
-;             lda  #'  | $80
-;             jsr  COUT
-;             lda  DISK_SECTOR
-;             jsr  touchsect
-
-;             ; next sector
-;             ldx  sectoffset
-;             inx
-;             stx  sectoffset
-;             cpx  #16
-;             bmi  nextsect
-
-
             ; --------------------------------------------------
             ; Prepare for disk access
             ; --------------------------------------------------
@@ -1060,7 +1029,6 @@ hexchars    byte '0 & $3F, '1 & $3F, '2 & $3F, '3 & $3F
             byte 'C & $3F, 'D & $3F, 'E & $3F, 'F & $3F
 
 sects_appledos byte 0,13,11,9,7,5,3,1,14,12,10,8,6,4,2,15
-sectoffset  byte
 
 
 dos33_6and2
