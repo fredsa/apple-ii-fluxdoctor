@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# FLUXDOCTOR v1.0
+# FLUXDOCTOR V1.1
 # 
 set -eu
 

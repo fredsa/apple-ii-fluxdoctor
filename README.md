@@ -1,4 +1,4 @@
-# **`FLUXDOCTOR`** v1.0 for Apple II computers
+# **`FLUXDOCTOR`** V1.1 for Apple II computers
 
 Apple Disk II diagnostic utility for real-time
 troubleshooting, diagnositcs, and repair.
