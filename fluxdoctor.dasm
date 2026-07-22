@@ -39,6 +39,7 @@ CV          equ  $25
 ; $06-$09 - Free Space
 EXIT_FLAG   equ  $06
 DATA_CHECKSUM equ $07
+RUNNING     equ  $08
 
 ; $1D-$1E - Free Space
 
@@ -444,6 +445,8 @@ freewheelloop
             beq  noexit
             ldx  DISK_SLOT ; restore X
             lda  MOTOROFF,x ; motor off
+            lda  #CODE_N
+            sta  RUNNING
             jsr  HOME
             printmessage M_BYE
             rts
@@ -460,12 +463,122 @@ noexit
             lda  spinnerchars,x
             sta  SPINNER_ADDR
 
+            ; --------------------------------------------------
+            ; Handle key press
+            ; --------------------------------------------------
+            lda  KBD
+            bmi  checkkeys
+            jmp  nokey
+checkkeys   sta  KBDSTRB
+            and  #$7f
+
+            cmp  #KBD_LEFT
+            bne  noleft
+            lda  DISK_TRACK
+            cmp  #0   ;lowest track
+            beq  noleft
+            dec  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+noleft
+
+            cmp  #KBD_RIGHT
+            bne  noright
+            lda  DISK_TRACK
+            cmp  #34  ; highest track
+            beq  noright
+            inc  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+noright
+
+            cmp  #'0
+            bne  nozero
+            lda  #0
+            sta  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+nozero
+
+            cmp  #'4
+            bne  nofour
+            lda  #34
+            sta  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+nofour
+
+            cmp  #$1B ; ESC
+            bne  noesc
+            lda  #$FF
+            sta  EXIT_FLAG
+noesc
+            cmp  #'N
+            bne  nomotoron
+            ldx  DISK_SLOT ; restore X
+            lda  MOTORON,x ; motor on
+            lda  #CODE_Y
+            sta  RUNNING
+nomotoron
+
+            cmp  #'F
+            bne  nomotoroff
+            ldx  DISK_SLOT ; restore X
+            lda  MOTOROFF,x ; motor off
+            lda  #CODE_N
+            sta  RUNNING
+nomotoroff
+
+            cmp  #'1
+            bne  nodrive1
+            ldx  DISK_SLOT ; restore X
+            lda  MOTOROFF,x ; motor off
+            lda  #CODE_N
+            sta  RUNNING
+            lda  #$01
+            sta  DISK_DRIVE
+            jsr  setdisktrack
+            jsr  resetscreen
+            ldx  DISK_SLOT ; restore X
+            lda  DRV0EN,x
+            lda  MOTORON,x ; motor on
+            lda  #CODE_Y
+            sta  RUNNING
+nodrive1
+
+            cmp  #'2
+            bne  nodrive2
+            ldx  DISK_SLOT ; restore X
+            lda  MOTOROFF,x ; motor off
+            lda  #CODE_N
+            sta  RUNNING
+            lda  #$02
+            sta  DISK_DRIVE
+            jsr  setdisktrack
+            jsr  resetscreen
+            ldx  DISK_SLOT ; restore X
+            lda  DRV1EN,x
+            lda  MOTORON,x ; motor on
+            lda  #CODE_Y
+            sta  RUNNING
+nodrive2
+
+nokey
+
+            ; --------------------------------------------------
+            ; Is the motor running?
+            ; --------------------------------------------------
+            lda  RUNNING
+            cmp  #CODE_Y
+            beq  dofreewheelscan
+            jmp  freewheelloop ; avoid infinite readbyte loop
 
 
             ; --------------------------------------------------
             ; Find address field:
             ;   D5 AA 96 {2:VOL} {2:TRACK} {2:SECT} {2:CHKSUM} DE AA EB
             ; --------------------------------------------------
+dofreewheelscan
             ldx  DISK_SLOT ; restore X
 
 
@@ -621,97 +734,6 @@ nodatafield
             ; jmp  enddataerr
 
 enddataerr
-
-
-            ; --------------------------------------------------
-            ; Handle key press
-            ; --------------------------------------------------
-            lda  KBD
-            bmi  checkkeys
-            jmp  nokey
-checkkeys   sta  KBDSTRB
-            and  #$7f
-
-            cmp  #KBD_LEFT
-            bne  noleft
-            lda  DISK_TRACK
-            cmp  #0   ;lowest track
-            beq  noleft
-            dec  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-noleft
-
-            cmp  #KBD_RIGHT
-            bne  noright
-            lda  DISK_TRACK
-            cmp  #34  ; highest track
-            beq  noright
-            inc  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-noright
-
-            cmp  #'0
-            bne  nozero
-            lda  #0
-            sta  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-nozero
-
-            cmp  #'4
-            bne  nofour
-            lda  #34
-            sta  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-nofour
-
-            cmp  #$1B ; ESC
-            bne  noesc
-            lda  #$FF
-            sta  EXIT_FLAG
-noesc
-            cmp  #'N
-            bne  nomotoron
-            ldx  DISK_SLOT ; restore X
-            lda  MOTORON,x ; motor on
-nomotoron
-
-            cmp  #'F
-            bne  nomotoroff
-            ldx  DISK_SLOT ; restore X
-            lda  MOTOROFF,x ; motor off
-nomotoroff
-
-            cmp  #'1
-            bne  nodrive1
-            ldx  DISK_SLOT ; restore X
-            lda  MOTOROFF,x ; motor off
-            lda  #$01
-            sta  DISK_DRIVE
-            jsr  setdisktrack
-            jsr  resetscreen
-            ldx  DISK_SLOT ; restore X
-            lda  DRV0EN,x
-            lda  MOTORON,x ; motor on
-nodrive1
-
-            cmp  #'2
-            bne  nodrive2
-            ldx  DISK_SLOT ; restore X
-            lda  MOTOROFF,x ; motor off
-            lda  #$02
-            sta  DISK_DRIVE
-            jsr  setdisktrack
-            jsr  resetscreen
-            ldx  DISK_SLOT ; restore X
-            lda  DRV1EN,x
-            lda  MOTORON,x ; motor on
-nodrive2
-
-nokey
             jmp  freewheelloop
 
 
@@ -852,7 +874,8 @@ seek
             jsr  RWTS
             ldx  DISK_SLOT ; restore X
             lda  MOTORON,x ; keep motor on
-            bcs  seekerr
+            lda  #CODE_Y
+            sta  RUNNING
             php
             renderhex DISK_TRACK,TARGET_TRACK_ADDR
             plp
@@ -861,28 +884,29 @@ seekerr     lda  #ERR_CODE_SEEK
             sta  SEEK_ERR_ADDR
 noseekerr
             jsr  showwp
-
             rts
 
 
-readsect
-            lda  #DISK_CMD_READ
-            sta  DISK_CMD
+; readsect
+;             lda  #DISK_CMD_READ
+;             sta  DISK_CMD
 
-            lda  #<DISK_BUFFER
-            sta  DISK_BUFFPTR
-            lda  #>DISK_BUFFER
-            sta  DISK_BUFFPTR+1
+;             lda  #<DISK_BUFFER
+;             sta  DISK_BUFFPTR
+;             lda  #>DISK_BUFFER
+;             sta  DISK_BUFFPTR+1
 
-            lda  #>DISK_IOB
-            ldy  #<DISK_IOB
-            jsr  RWTS
-            bcc  nodiskerr
-diskerr     lda  #ERR_CODE_SEEK
-            sta  SEEK_ERR_ADDR
-            renderhex DISK_ERR,RWTS_ERR_ADDR
-nodiskerr
-            rts
+;             lda  #>DISK_IOB
+;             ldy  #<DISK_IOB
+;             jsr  RWTS
+;             lda #???
+;             sta RUNNING
+;             bcc  nodiskerr
+; diskerr     lda  #ERR_CODE_SEEK
+;             sta  SEEK_ERR_ADDR
+;             renderhex DISK_ERR,RWTS_ERR_ADDR
+; nodiskerr
+;             rts
 
 
 setdisktrack
