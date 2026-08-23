@@ -200,6 +200,33 @@ ERR_CODE_EPILOGUE equ 'E & $3f
 CODE_Y      equ  'Y & $3f
 CODE_N      equ  'N & $3f
 
+; --------------------------------------------------
+; Memory start addresses rows 0-23
+; --------------------------------------------------
+text_row_00 equ  $400
+text_row_01 equ  $480
+text_row_02 equ  $500
+text_row_03 equ  $580
+text_row_04 equ  $600
+text_row_05 equ  $680
+text_row_06 equ  $700
+text_row_07 equ  $780
+text_row_08 equ  $428
+text_row_09 equ  $4a8
+text_row_0a equ  $528
+text_row_0b equ  $5a8
+text_row_0c equ  $628
+text_row_0d equ  $6a8
+text_row_0e equ  $728
+text_row_0f equ  $7a8
+text_row_10 equ  $450
+text_row_11 equ  $4d0
+text_row_12 equ  $550
+text_row_13 equ  $5d0
+text_row_14 equ  $650
+text_row_15 equ  $6d0
+text_row_16 equ  $750
+text_row_17 equ  $7d0
 
 ; --------------------------------------------------
 ; Macros
@@ -775,7 +802,6 @@ clearsect   ldy  #15
 clearsectloop
             tya
             asl
-            adc  #<touchsect_pos
             tax
             lda  #'_ | $80
             sta  touchsect_addr,x
@@ -803,7 +829,6 @@ touchsect   and  #$0f ; TODO report bad sector > $0f
             tay
             txa
             asl
-            adc  #<touchsect_pos
             tax
             lda  hexchars,y
             and  #$bf
@@ -910,7 +935,7 @@ noseekerr
 ;             bcc  nodiskerr
 ; diskerr     lda  #ERR_CODE_SEEK
 ;             sta  SEEK_ERR_ADDR
-;             renderhex DISK_ERR,RWTS_ERR_ADDR
+;             renderhex DISK_ERR,TARGET_ERR_ADDR
 ; nodiskerr
 ;             rts
 
@@ -990,14 +1015,14 @@ M_SLOT_DRIVE
             byte $00, $00 ; ypos,xpos
             byte "SLOT _   DRIVE _ :",13
             byte 0
-SLOT_ADDR   equ  $0405
-DRIVE_ADDR  equ  $040f
-SPINNER_ADDR equ $0411
+SLOT_ADDR   equ  text_row_00+5
+DRIVE_ADDR  equ  text_row_00+15
+SPINNER_ADDR equ text_row_00+17
 
 M_WRITE_PROTECT
             byte $00,$13 ; ypos, xpos
             byte "WRITE PROTECT _",0
-WRITE_PROTECT_ADDR equ $0421
+WRITE_PROTECT_ADDR equ text_row_00+33
 
 M_VERSION
             byte $00,$24 ; ypos, xpos
@@ -1006,8 +1031,10 @@ M_VERSION
 M_TARGET_TRACK
             byte $01,$00 ; ypos, xpos
             byte "TARGET VOL __   TRK __   SEC __   ERR __",0
-TARGET_TRACK_ADDR equ $0494
-RWTS_ERR_ADDR equ $04A6
+;TARGET_VOL_ADDR equ text_row_01+11
+TARGET_TRACK_ADDR equ text_row_01+20
+;TARGET_SEC_ADDR equ text_row_01+29
+;TARGET_ERR_ADDR equ text_row_01+38
 
 M_DIVIDER
             byte $02,$00 ; ypos, xpos
@@ -1016,38 +1043,37 @@ M_DIVIDER
 M_VOL_TRK_SECT
             byte $04, 00 ; ypos, xpos
             byte "READ   VOL __   TRK __   SEC __   CHK __",0
-VOLUME_ADDR equ  $060b
-TRACK_ADDR  equ  $0614
-SECTOR_ADDR equ  $061D
-CHKSUM_ADDR equ  $0626
+VOLUME_ADDR equ  text_row_04+11
+TRACK_ADDR  equ  text_row_04+20
+SECTOR_ADDR equ  text_row_04+29
+CHKSUM_ADDR equ  text_row_04+38
 
-touchsect_pos equ $0404
-touchsect_addr equ $0700
+touchsect_addr equ text_row_06+5
 
 M_DATA_CHECKSUM
-            byte $09,$00 ; ypos, xpos
+            byte $08,$00 ; ypos, xpos
             byte "SEEK ERR _         DATA CHECKSUM ERR ___",0
-SEEK_ERR_ADDR equ $4b1
-DATA_CHECKSUM_ADDR equ $4cd
+SEEK_ERR_ADDR equ text_row_08+9
+DATA_CHECKSUM_ADDR equ text_row_08+37
 
 M_FIELDS
-            byte $0b,$00 ; ypos, xpos
+            byte $0a,$00 ; ypos, xpos
             byte "ADDR FIELD ERR ___    DATA FIELD ERR ___",0
-ADDR_FIELD_ERR_ADDR_M equ $5b7
-ADDR_FIELD_ERR_ADDR_K equ $5b8
-ADDR_FIELD_ERR_ADDR_E equ $5b9
-DATA_FIELD_ERR_ADDR_M equ $5cd
-DATA_FIELD_ERR_ADDR_K equ $5ce
-DATA_FIELD_ERR_ADDR_E equ $5cf
+ADDR_FIELD_ERR_ADDR_M equ text_row_0a+15
+ADDR_FIELD_ERR_ADDR_K equ text_row_0a+16
+ADDR_FIELD_ERR_ADDR_E equ text_row_0a+17
+DATA_FIELD_ERR_ADDR_M equ text_row_0a+37
+DATA_FIELD_ERR_ADDR_K equ text_row_0a+38
+DATA_FIELD_ERR_ADDR_E equ text_row_0a+39
 
 M_BAD_TRACK
-            byte $0e, 00 ; ypos, xpos
+            byte $0d, 00 ; ypos, xpos
             byte "UNEXPECTED TRACK __, SEEK TO __? [Y]/[N]",0
 M_BAD_TRACK_OK
-            byte $0e, 00 ; ypos, xpos
+            byte $0d, 00 ; ypos, xpos
             byte "                                        ",0
-BAD_TRACK_ADDR1 equ $739
-BAD_TRACK_ADDR2 equ $745
+BAD_TRACK_ADDR1 equ text_row_0d+17
+BAD_TRACK_ADDR2 equ text_row_0d+29
 
 
 M_COPYRIGHT
@@ -1065,10 +1091,10 @@ M_INSTRUCTIONS
             byte "                              [ESC] EXIT"
             byte "ERROR",13
             byte "CODES: _EEK  _ISSING  CHEC_SUM  _PILOGUE",0
-ERR_CODE_SEEK_ADDR equ $757
-ERR_CODE_MISSING_ADDR equ $75d
-ERR_CODE_CHECKSUM_ADDR equ $76a
-ERR_CODE_EPILOGUE_ADDR equ $770
+ERR_CODE_SEEK_ADDR equ text_row_16+7
+ERR_CODE_MISSING_ADDR equ text_row_16+13
+ERR_CODE_CHECKSUM_ADDR equ text_row_16+26
+ERR_CODE_EPILOGUE_ADDR equ text_row_16+32
 
 M_BYE
             byte $00,$00 ; ypos, xpos
@@ -1104,9 +1130,14 @@ dos33_6and2
             byte $F7, $F9, $FA, $FB, $FC, $FD, $FE, $FF ; 6-bit values $38 - $3f
 
 text_rows
-            word $400,$480,$500,$580,$600,$680,$700,$780 ; rows 0-7
-            word $428,$4a8,$528,$5a8,$628,$6a8,$728,$7a8 ; row 8-15
-            word $450,$4d0,$550,$5d0,$650,$6d0,$750,$7d0 ; row 16-23
+            word text_row_00,text_row_01,text_row_02,text_row_03,text_row_04
+            word text_row_05,text_row_06,text_row_07,text_row_08,text_row_09
+            word text_row_0a,text_row_0b,text_row_0c,text_row_0d,text_row_0e
+            word text_row_0f,text_row_10,text_row_11,text_row_12,text_row_13
+            word text_row_14,text_row_15,text_row_16,text_row_17
 
 PGM_END
 ; Don't add instructions after this line
+
+foo         equ  text_rows+1
+            lda  foo
