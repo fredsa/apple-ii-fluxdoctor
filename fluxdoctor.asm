@@ -431,9 +431,10 @@ prepmap2    lda  dos33_6and2,y
             ; Boilerplate text
             ; --------------------------------------------------
             jsr  resetscreen
+            printmessage M_INSTRUCTIONS
             printmessageinv M_TITLE
             printmessage M_COPYRIGHT
-            printmessage M_INSTRUCTIONS
+            printmessage M_GITHUB
             lda  #ERR_CODE_SEEK
             sta  ERR_CODE_SEEK_ADDR
             lda  #ERR_CODE_MISSING
@@ -1076,28 +1077,34 @@ BAD_TRACK_ADDR1 equ text_row_0d+17
 BAD_TRACK_ADDR2 equ text_row_0d+29
 
 
-M_COPYRIGHT
-            byte $10,$0f ; ypos, xpos
-            byte "COPYRIGHT FRED SAUER 2026",0
-
-M_TITLE
-            byte $10,$00 ; ypos, xpos
-            byte " FLUXDOCTOR ",0
-
 M_INSTRUCTIONS
-            byte $12,$00 ; ypos, xpos
+            byte $0f,$00 ; ypos, xpos
             byte "SELECT DRIVE [1], [2]   MOTOR O[N] OF[F]"
             byte "TRACK [0], 3[4] OR [LEFT]/[RGHT] FOR -/+"
             byte "                              [ESC] EXIT"
             byte "ERROR",13
             byte "CODES: _EEK  _ISSING  CHEC_SUM  _PILOGUE",0
-ERR_CODE_SEEK_ADDR equ text_row_16+7
-ERR_CODE_MISSING_ADDR equ text_row_16+13
-ERR_CODE_CHECKSUM_ADDR equ text_row_16+26
-ERR_CODE_EPILOGUE_ADDR equ text_row_16+32
+ERR_CODE_SEEK_ADDR equ text_row_13+7
+ERR_CODE_MISSING_ADDR equ text_row_13+13
+ERR_CODE_CHECKSUM_ADDR equ text_row_13+26
+ERR_CODE_EPILOGUE_ADDR equ text_row_13+32
+
+M_TITLE
+            byte $16,$01 ; ypos, xpos
+            byte " FLUXDOCTOR ",0
+
+M_COPYRIGHT
+            byte $16,$0e ; ypos, xpos
+            byte "COPYRIGHT FRED SAUER 2026",0
+
+M_GITHUB
+            byte $17,$01 ; ypos, xpos
+            byte "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR"
 
 M_BYE
             byte $00,$00 ; ypos, xpos
+            byte "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR",13
+            byte 13
             byte "THANK YOU FOR USING FLUXDOCTOR.",13
             byte "GOODBYE FOR NOW.",13
             byte 0
