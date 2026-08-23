@@ -1027,7 +1027,7 @@ WRITE_PROTECT_ADDR equ text_row_00+33
 
 M_VERSION
             byte $00,$24 ; ypos, xpos
-            byte "V1.1",0
+            byte "V1.2",0
 
 M_TARGET_TRACK
             byte $01,$00 ; ypos, xpos
