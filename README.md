@@ -1,19 +1,29 @@
 # **`FLUXDOCTOR`** V1.2 for Apple II computers
 
-Apple Disk II diagnostic utility for real-time
-troubleshooting, diagnositcs, and repair.
+Diagnostic utility for real-time troubleshooting, calibration, and repair of
+Apple II floppy disks drives. Runs natively on Apple II computer hardware.
 
-<img width="50%" height="50%" src="fluxdoctor.png">
+- Drive spins indefinitely by default for easy troubleshooting
+- Autostarts, no keyboard required to diagnose floppy drive read performance
+- Provides direct low-level control to stop/start motor and seek heads
+- Real-time display of sector read performance and errors
+- Exposes weak reads and subtle intermittent errors hidden by DOS
+- Distinguishes seek, checksum, and sector prologue/epilogue errors
+- Can be used to diagnose poorly written or misaligned floppy disk drives
 
 Available as a bootable (140kB) DOS 3.3 floppy disk image (`*.DO`) from the
 **Releases** page.
 
-`FLUXDOCTOR` currently requires a system that was booted from a DOS 3.3 disk as
-it expects a DOS 3.3 environment and utilizes `RWTS` routines for track seeks.
-Real time reading of disk data is done directly from 6502 assembly.
+<img width="50%" height="50%" src="fluxdoctor.png">
+
+`FLUXDOCTOR` requires a DOS 3.3 environment as it utilizes DOS `RWTS` routines
+for track seeks. All other functions are performed by accessing the hardware
+directly directly from 6502 assembly.
 
 
-# Prerequisites
+# Build prerequisites
+
+To build FLUXDOCTOR from source, you'll need the following:
 
 1. To be able to compile FLUXDOCTOR from source, install **dasm** assembler from
    https://dasm-assembler.github.io/
@@ -29,23 +39,25 @@ Real time reading of disk data is done directly from 6502 assembly.
 
 # Build instructions
 
+To build FLUXDOCTOR, run the provied bash script:
+
 ```
 ./run.sh
 ```
 
 # Writing physical floppy disks
 
-There many options to choose from, including:
+To make a physical FLUXDOCTOR floppy disk, you have a few options:
 
 ## Greaseweazle
 
-Purchase a [Greaseweazle](https://github.com/keirf/greaseweazle). Then, to write
-the 35-track 140kB `fluxdoctor.do` DOS 3.3 floppy disk image to a double density
-floppy disk using a standard (80 track) 5.25" PC floppy drive, simply specify
-`--tracks=step=2` when using the `gw` command:
+Purchase a [Greaseweazle](https://github.com/keirf/greaseweazle). Use the `gw`
+command to write the 35-track 140kB `fluxdoctor.do` DOS 3.3 floppy disk image
+using any PC or Shutgart 5.25" floppy drive to a double density floppy diskL
 
 ```
-gw write --tracks=step=2 fluxdoctor.do
+# Specify `--tracks=step=2` if your using a 96TPI drive.
+gw write --tracks=step=2 fluxdoctor-*.do
 ```
 
 ## ADTPro
@@ -64,6 +76,9 @@ floppy disk.
 To compile `c2t.exe` on Windows, install the
 [MSYS2](https://www.msys2.org/docs/environments/) `UCRT64` environment.
 
+Use `c2t` to create the WAV file which you can stream to your Apple II cassette
+port:
+
 ```
 cp fluxdoctor.do fluxdoctor.dsk
 c2t fluxdoctor.dsk fluxdoctor.wav
@@ -72,10 +87,10 @@ c2t fluxdoctor.dsk fluxdoctor.wav
 
 # Testing
 
-Install an Apple II emulator for local testing, such as
+During development it's not always convenient to test on real hard. There are
+many suitable Apple II emulators available, see:
    - Web browser: [appleiijs](https://www.scullinsteel.com/apple2/) /
      [appleiijse](https://www.scullinsteel.com/apple//e)
-   - macOS / linux: see
+   - Linux / macOS: see
      https://en.wikipedia.org/wiki/List_of_computer_system_emulators#Apple_II
    - Windows: **AppleWin** from https://github.com/AppleWin/AppleWin
-
