@@ -70,4 +70,9 @@ echo "Final disk image:"
 echo "  fluxdoctor.do"
 $AC -ll fluxdoctor.do
 
+echo "To write image to a physical floppy using greaseweazle:"
+echo "  gw write --tracks=step=2 fluxdoctor.do    # 96TPI floppy drive"
+echo "  gw write fluxdoctor.do                    # 48TPI floppy drive"
+
+echo "Launching AppleWin emulator"
 AppleWin -d1 fluxdoctor.do
