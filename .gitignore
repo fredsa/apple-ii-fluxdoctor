@@ -1,11 +1,8 @@
-# FLUXDOCTOR disk image
-fluxdoctor.do
+# Generated output files
+/out/
 
-# compiled binaries
-/*.bin
-
-# c2t audio files
-/*.wav
-
-# screenshots
+# Emulator screenshots
 /*.bmp
+
+# O/S junk
+.DS_Store
