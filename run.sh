@@ -4,6 +4,16 @@
 # 
 set -eu
 
+cleanup() {
+    local exit_code=$?
+
+    if [ "$exit_code" -ne 0 ]; then
+        echo
+        echo "❌ exit code: $exit_code" >&2
+    fi
+}
+trap cleanup EXIT
+
 os_name="$(uname -s)"
 case $os_name in
   Darwin) # macOS
