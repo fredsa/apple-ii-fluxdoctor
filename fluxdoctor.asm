@@ -499,6 +499,12 @@ noexit
             jmp  nokey
 checkkeys   sta  KBDSTRB
             and  #$7f
+            cmp  #'a
+            bcc  nokeycase
+            cmp  #'z+1
+            bcs  nokeycase
+            eor  #$20
+nokeycase
 
             cmp  #KBD_LEFT
             bne  noleft
@@ -974,6 +980,12 @@ maybefixkey lda  KBD
             bpl  maybefixkey
             sta  KBDSTRB
             and  #$7f
+            cmp  #'a
+            bcc  maybefixnocase
+            cmp  #'z+1
+            bcs  maybefixnocase
+            eor  #$20
+maybefixnocase
             cmp  #$1B ; ESC
             bne  maybefixnoesc
             lda  #$FF
