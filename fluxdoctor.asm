@@ -1,5 +1,5 @@
 ; --------------------------------------------------
-; FLUXDOCTOR V1.1
+; FLUXDOCTOR V1.2
 ; Copyright Fred Sauer 2026
 ; See LICENSE.txt
 ;
