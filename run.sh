@@ -4,6 +4,28 @@
 # 
 set -eu
 
+os_name="$(uname -s)"
+case $os_name in
+  Darwin) # macOS
+    emulator='/Applications/Virtual ][.app/Contents/MacOS/Virtual ]['
+    emulatorurl="https://www.virtualii.com/"
+    AC="$HOME/.local/bin/ac-mac-aarch64-13.1"
+    ;;
+  Linux) # Linux
+    emulator="todo"
+    emulatorurl="todo"
+    AC="$HOME/ac-linux-*-13.1.exe"
+    ;;
+  MINGW64*) # Windows Git Bash
+    emulator="AppleWin"
+    emulatorurl="https://github.com/AppleWin/AppleWin"
+    AC="$HOME/ac-windows-amd64-13.1.exe"
+    ;;
+  *)
+    echo "ERROR: Unknown OS `$os_name`" 1>&2
+    ;;
+esac
+
 if ! type -p dasm >/dev/null 2>&1; then
     echo "ERROR, missing executable:" 1>&2
     echo "  dasm" 1>&2
@@ -13,22 +35,21 @@ if ! type -p dasm >/dev/null 2>&1; then
     exit 1
 fi
 
-if ! type -p AppleWin >/dev/null 2>&1; then
+if ! type -p "$emulator" >/dev/null 2>&1; then
     echo "ERROR, missing executable:" 1>&2
-    echo "  AppleWin" 1>&2
+    echo "  $emulator" 1>&2
     echo "" 1>&2
-    echo "Please install AppleWin from:" 1>&2
-    echo "  https://github.com/AppleWin/AppleWin" 1>&2
+    echo "Please install $emulator from:" 1>&2
+    echo "  $emulatorurl" 1>&2
     exit 1
 fi
 
-AC="$HOME/ac-windows-amd64-13.1.exe"
 if [[ ! -x "$AC" ]]; then
     echo "ERROR missing executable:" 1>&2
     echo "  $AC" 1>&2
     echo "" 1>&2
-    echo "Please install Apple Commander from:" 1>&2
-    echo "  https://applecommander.github.io/ac/" 1>&2
+    echo "Please install Apple Commander (`ac` CLI) from:" 1>&2
+    echo "  https://applecommander.github.io/installation/command-line/" 1>&2
     exit 1
 fi
 
@@ -74,5 +95,22 @@ echo "To write image to a physical floppy using greaseweazle:"
 echo "  gw write --tracks=step=2 fluxdoctor.do    # 96TPI floppy drive"
 echo "  gw write fluxdoctor.do                    # 48TPI floppy drive"
 
-echo "Launching AppleWin emulator"
-AppleWin -d1 fluxdoctor.do
+os_name="$(uname -s)"
+case $os_name in
+  Darwin)
+    # macOS
+    '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' fluxdoctor.do
+    ;;
+  Linux)
+    # Linux
+    echo "TODO: launch emulator with disk image: fluxdoctor.do"
+    ;;
+  MINGW64*)
+    # Windows Git Bash
+    echo "Launching AppleWin emulator"
+    AppleWin -d1 fluxdoctor.do
+    ;;
+  *)
+    echo "ERROR: Unknown OS name for `$os_name`" 1>&2
+    ;;
+esac
