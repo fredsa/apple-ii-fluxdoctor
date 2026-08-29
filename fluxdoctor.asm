@@ -1145,6 +1145,3 @@ text_rows
 
 PGM_END
 ; Don't add instructions after this line
-
-foo         equ  text_rows+1
-            lda  foo
