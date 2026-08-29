@@ -81,6 +81,7 @@ rm -f out/disk-pgm.bin
 rm -f out/fluxdoctor-tape.asm
 rm -f out/fluxdoctor-tape.bin
 rm -f out/fluxdoctor-tape.wav
+rm -f out/fluxdoctor-tape.mon
 
 echo
 echo "====================================================================="
@@ -156,6 +157,14 @@ echo "====================================================================="
 echo "Creating cassette bootable WAV file:"
 echo "  out/fluxdoctor-tape.bin -> out/fluxdoctor-tape.wav"
 fluxrider out/fluxdoctor-tape.bin out/fluxdoctor-tape.wav
+
+echo "Creating monitor type in version of tape program:"
+echo
+echo "====================================================================="
+echo "  out/fluxdoctor-tape.bin -> out/fluxdoctor-tape.mon"
+# BASIC start address
+echo -n "0801" > out/fluxdoctor-tape.mon
+hexdump -v -e '":" 8/1 "%02X " "\n"' out/fluxdoctor-tape.bin >> out/fluxdoctor-tape.mon
 
 echo
 echo "====================================================================="
