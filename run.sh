@@ -137,6 +137,8 @@ echo
 echo "====================================================================="
 echo "Adding binary to disk image:"
 echo "  out/disk-pgm.bin -> FLUXDOCTOR"
+# https://applecommander.github.io/cli/ac/#putting-files-and-file-types
+# https://en.wikipedia.org/wiki/Apple_DOS#Technical_details
 $AC -p out/fluxdoctor.do FLUXDOCTOR B $startaddr < out/disk-pgm.bin
 
 echo
