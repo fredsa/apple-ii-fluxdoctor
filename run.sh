@@ -72,6 +72,11 @@ if ! type -p fluxrider >/dev/null 2>&1; then
     exit 1
 fi
 
+if [[ ! -r fluxdoctor.asm ]]; then
+    echo "MISSING: fluxdoctor.asm" 1>&2
+    exit 1
+fi
+
 echo "====================================================================="
 echo "Cleanup output folder: out/"
 mkdir -p out
@@ -100,10 +105,6 @@ echo "====================================================================="
 echo "Compiling:"
 echo "  fluxdoctor.asm -> out/fluxdoctor.bin"
 echo "  out/fluxdoctor-tape.asm -> out/fluxdoctor-tape.bin"
-if [[ ! -r fluxdoctor.asm ]]; then
-    echo "MISSING: fluxdoctor.asm" 1>&2
-    exit 1
-fi
 dasm fluxdoctor.asm -f3 -oout/fluxdoctor.bin
 echo "  out/fluxdoctor-tape.asm -> out/fluxdoctor-tape.bin"
 dasm out/fluxdoctor-tape.asm -f3 -oout/fluxdoctor-tape.bin
