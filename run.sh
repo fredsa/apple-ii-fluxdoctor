@@ -164,7 +164,9 @@ echo "====================================================================="
 echo "  out/fluxdoctor-tape.bin -> out/fluxdoctor-tape.mon"
 # BASIC start address
 echo -n "0801" > out/fluxdoctor-tape.mon
-hexdump -v -e '":" 8/1 "%02X " "\n"' out/fluxdoctor-tape.bin >> out/fluxdoctor-tape.mon
+xxd -p -c 8 out/fluxdoctor-tape.bin \
+  | awk '{gsub(/(..)/, "& "); print ":" toupper($0)}' \
+  >> out/fluxdoctor-tape.mon
 
 echo
 echo "====================================================================="
