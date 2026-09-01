@@ -12,7 +12,7 @@
 ; --------------------------------------------------
 ; Desired start of program execution
 ; --------------------------------------------------
-pgmstart    equ  $2000
+pgmstart    equ  $080D ; 42 CALL 2061
 PGM_LENGTH  equ  PGM_END - pgmstart
 
             seg
