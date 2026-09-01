@@ -73,14 +73,14 @@ CALC_CHKSUM equ  $FE
 ; $0800 - $0BFF - Text Video Page 2 or Applesoft Program and Variables
 
 ; $0C00 - $1FFF - Free Space for Machine Language, Shapes, etc.
-DISK_BUFFER equ  $0c00 ; $c00-$cff 256 bytes
-MAP_6AND2   equ  $0d00 ; $d00-$dff 256 bytes
 
 ; $2000 - $3FFF -  High Resolution Graphics Page 1
 
 ; $4000 - $5FFF -  High Resolution Graphics Page 2
 
 ; $6000 - $95FF -  Applesoft String Data
+DISK_BUFFER equ  $6000 ; $c00-$cff 256 bytes
+MAP_6AND2   equ  $6100 ; $d00-$dff 256 bytes
 
 ; --------------------------------------------------
 ; ROM routines
