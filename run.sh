@@ -81,20 +81,25 @@ echo "====================================================================="
 echo "Cleanup output folder: out/"
 mkdir -p out
 rm -f out/fluxdoctor.do
-rm -f out/fluxdoctor.bin
-rm -f out/disk-pgm.bin
-rm -f out/fluxdoctor-tape.asm
-rm -f out/fluxdoctor-tape.bin
-rm -f out/fluxdoctor-tape.wav
-rm -f out/fluxdoctor-tape.mon
+rm -f out/disk.asm out/tape.asm
+rm -f out/disk.out out/tape.out
+rm -f out/disk.bin out/tape.bin out/tape-basic.bin
+rm -f out/tape-basic.wav
+rm -f out/tape-basic.mon
 
 echo
 echo "====================================================================="
-echo "Creating single file tape program:"
+echo "Preparing source files:"
+echo "  -> out/disk.asm"
+echo "  -> out/tape.asm"
+cp fluxdoctor.asm out/disk.asm
 cat fluxdoctor.asm \
-    | sed -e 's#pgmstart *equ *$2000#pgmstart equ $080d#' \
-    > out/fluxdoctor-tape.asm
-if cmp -s fluxdoctor.asm out/fluxdoctor-tape.asm
+    | sed -e 's#pgmstart *equ *$....#pgmstart equ $2000#' \
+    > out/disk.asm
+cat fluxdoctor.asm \
+    | sed -e 's#pgmstart *equ *$....#pgmstart equ $080d#' \
+    > out/tape.asm
+if cmp -s fluxdoctor.asm out/tape.asm
 then
     echo "Failed to modify start address" 1>&2
     exit 1
@@ -102,23 +107,30 @@ fi
 
 echo
 echo "====================================================================="
-echo "Compiling:"
-echo "  fluxdoctor.asm -> out/fluxdoctor.bin"
-echo "  out/fluxdoctor-tape.asm -> out/fluxdoctor-tape.bin"
-dasm fluxdoctor.asm -f3 -oout/fluxdoctor.bin
-echo "  out/fluxdoctor-tape.asm -> out/fluxdoctor-tape.bin"
-dasm out/fluxdoctor-tape.asm -f3 -oout/fluxdoctor-tape.bin
-# ls -l out/fluxdoctor.bin out/fluxdoctor-tape.bin
+for t in disk tape; do
+  echo "Compiling $t:"
+  echo "  out/$t.asm -> out/$t.out"
+  dasm out/$t.asm -f3 -oout/$t.out
+done
 
 echo
 echo "====================================================================="
-echo "Extracting disk binary (removing 4 byte header):"
-echo "  out/fluxdoctor.bin -> out/disk-pgm.bin"
-# Get start address in hex from first two byte.
-startaddr="0x$(od -An -t x2 -N2 out/fluxdoctor.bin | tr -d ' ')"
-echo "Start address: $startaddr"
-# Remove first four bytes (start + len)
-cat out/fluxdoctor.bin | tail -c+5 > out/disk-pgm.bin
+for t in disk tape; do
+  echo "Extracting $t binary (removing 4 byte header):"
+  # Get start address in hex from first two byte.
+  startaddr="0x$(od -An -t x2 -N2 out/$t.bin | tr -d ' ')"
+  echo "  => start address: $startaddr"
+  echo "  out/$t.out -> out/$t.bin"
+  # Remove first four bytes (start + len)
+  cat out/$t.out | tail -c+5 > out/$t.bin
+done
+
+echo
+echo "====================================================================="
+echo "Creating out/tape-basic.bin"
+# `42 CALL 2061`
+printf '\x0B\x08\x2A\x00\x8C\x32\x30\x36\x31\x00\x00\x00' > out/tape-basic.bin
+cat out/tape.bin >> out/tape-basic.bin
 
 echo
 echo "====================================================================="
@@ -127,20 +139,20 @@ echo "  template/hello.do -> out/fluxdoctor.do"
 # $AC -dos140 out/fluxdoctor.do
 cp template/hello.do out/fluxdoctor.do
 # ls -l out/fluxdoctor.do
-
-echo
-echo "====================================================================="
-echo "Removing FLUXDOCTOR from template disk image:"
-echo "  FLUXDOCTOR"
+echo "Removing existing FLUXDOCTOR from template disk image:"
+echo "  out/fluxdoctor.do : delete FLUXDOCTOR"
 $AC -d out/fluxdoctor.do FLUXDOCTOR
 
-echo
-echo "====================================================================="
-echo "Adding binary to disk image:"
-echo "  out/disk-pgm.bin -> FLUXDOCTOR"
 # https://applecommander.github.io/cli/ac/#putting-files-and-file-types
 # https://en.wikipedia.org/wiki/Apple_DOS#Technical_details
-$AC -p out/fluxdoctor.do FLUXDOCTOR B $startaddr < out/disk-pgm.bin
+echo
+echo "====================================================================="
+echo "Adding disk binary to disk image:"
+echo "  out/disk-pgm.bin -> FLUXDOCTOR"
+$AC -p out/fluxdoctor.do FLUXDOCTOR B $startaddr < out/disk.bin
+echo "Adding tape binary to disk image:"
+echo "  out/tape-basic.bin -> FLUXDOCTOR"
+$AC -p out/fluxdoctor.do FLUXDOCTOR-TAPE A $startaddr < out/tape-basic.bin
 
 echo
 echo "====================================================================="
@@ -150,26 +162,19 @@ $AC -ll out/fluxdoctor.do
 
 echo
 echo "====================================================================="
-echo "Creating out/fluxdoctor-tape.bin"
-# `42 CALL 2061`
-printf '\x0B\x08\x2A\x00\x8C\x32\x30\x36\x31\x00\x00\x00' > out/fluxdoctor-tape.bin
-cat out/disk-pgm.bin >> out/fluxdoctor-tape.bin
-
-echo
-echo "====================================================================="
 echo "Creating cassette bootable WAV file:"
-echo "  out/fluxdoctor-tape.bin -> out/fluxdoctor-tape.wav"
-fluxrider out/fluxdoctor-tape.bin out/fluxdoctor-tape.wav
+echo "  out/tape-basic.bin -> out/tape-basic.wav"
+fluxrider out/tape-basic.bin out/tape-basic.wav
 
-echo "Creating monitor type in version of tape program:"
 echo
+echo "Creating monitor type-in version of tape program:"
 echo "====================================================================="
-echo "  out/fluxdoctor-tape.bin -> out/fluxdoctor-tape.mon"
+echo "  out/tape-basic.bin -> out/tape-basic.mon"
 # BASIC start address
-echo -n "0801" > out/fluxdoctor-tape.mon
-xxd -p -c 8 out/fluxdoctor-tape.bin \
+echo -n "0801" > out/tape-basic.mon
+xxd -p -c 8 out/tape-basic.bin \
   | awk '{gsub(/(..)/, "& "); print ":" toupper($0)}' \
-  >> out/fluxdoctor-tape.mon
+  >> out/tape-basic.mon
 
 echo
 echo "====================================================================="
@@ -182,7 +187,7 @@ case $os_name in
   Darwin)
     # macOS
     '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' out/fluxdoctor.do
-    # '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' out/fluxdoctor-tape.wav
+    # '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' out/tape-basic.wav
     ;;
   Linux)
     # Linux
