@@ -1336,8 +1336,7 @@ PTRMOV      LDA  (IOBPL),Y
             LDA  (IOBPL),Y    ; DETERMINE DRIVE ONE OR TWO
             LDY  #$10         ; SAME DRIVE USED BEFORE?
             CMP  (IOBPL),Y
-            BEQ  OK           ; IF SO, DON'T NECESSARILY WAIT FOR
-MOTOR
+            BEQ  OK           ; IF SO, DON'T NECESSARILY WAIT FOR MOTOR
             STA  (IOBPL),Y    ; NOW USING THIS DRIVE
             PLP               ; TELL HIM MOTOR WAS OFF
             LDY  #$00         ; SET ZERO FLAG
