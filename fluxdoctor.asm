@@ -1226,30 +1226,9 @@ text_rows
 ; --------------------------------------------------
 ; RWTS
 ; --------------------------------------------------
-;IOBPL       EQU $48 ; pointer to DISK_IOB
-;IOBPH       EQU $49 ;
-
-
 SLOT        EQU $5F8 ; HOLDS SLOT NUM USED
 PTRSDEST    EQU $3C
 DEVCTBL     EQU PTRSDEST
-; DRIVNO EQU $35
-;MAXSEEKS    EQU 4 ; MAX FOR SEEKCNT
-;SEEKCNT     EQU $4F8 ; # RESEEKS BEFORE RECALIBRATE
-;RETRYCNT    EQU $578
-;RECALCNT    EQU $6F8 ; # RECALIBRATES -1
-
-; --------------------------------------------------
-; RDADR16
-; --------------------------------------------------
-COUNT       EQU $26 ; 'MUST FIND' COUNT.
-LAST        EQU $26 ; 'ODD BIT' NIBLS.
-CSUM        EQU $27 ; CHECKSUM BYTE.
-CSSTV       EQU $2C ; FOUR BYTES,
-              ; * CHECKSUM, SECTOR, TRACK, AND VOLUME.
-SECT        EQU CSSTV+1
-TRACK       EQU CSSTV+2
-VOLUME      EQU CSSTV+3
 
 ; --------------------------------------------------
 ; MSWAIT
@@ -1266,32 +1245,12 @@ PRIOR       EQU $27 ; PRIOR HALFTRACK.
 TRKN        EQU $2A ; DESIRED TRACK.
 SLOTTEMP    EQU $2B ; SLOT NUM TIMES $10.
 
-; --------------------------------------------------
-; PRENIBL16
-; --------------------------------------------------
-T0          EQU $26 ; TEMP FOR POSTNBL16.
-
-; --------------------------------------------------
-; READ16
-; --------------------------------------------------
-IDX         EQU $26 ; INDEX INTO (BUF).
-
 
 ; --------------------------------------------------
 ; RWTS
 ; --------------------------------------------------
-RWTS        ;STY  IOBPL        ; UPON ENTRY, A&Y POINT AT THE
-            ;STA  IOBPH        ; I/O CONTROL BLOCK (IOB)
-            ;LDY  #2           ; SET RECALIBRATE
-            ;STY  RECALCNT     ; COUNT
-            ;LDY  #MAXSEEKS    ; SET RESEEK
-            ;STY  SEEKCNT      ; COUNT
-            ; LDY  #1           ; GET SLOT # FOR THIS OPERATION
-            ; LDA  (IOBPL),Y
-            lda DISK_SLOT     ; GET SLOT # FOR THIS OPERATION
+RWTS        lda DISK_SLOT     ; GET SLOT # FOR THIS OPERATION
             TAX
-            ; LDY  #$0F         ; DID HE CHANGE SLOTS?
-            ; CMP  (IOBPL),Y
             cmp OSLOT         ; DID HE CHANGE SLOTS?
             BEQ  SAMESLOT     ; IF HE DIDN'T, GOOD FOR HIM!
 ; *
@@ -1301,12 +1260,10 @@ RWTS        ;STY  IOBPL        ; UPON ENTRY, A&Y POINT AT THE
 ; * BE THE SAME FOR AT LEAST 96 MICROSECONDS
             TXA               ; SAVE NEW SLOT #
             PHA
-            ; LDA  (IOBPL),Y    ; GET 'OLD SLOT NUMBER'
             lda OSLOT
             TAX
             PLA
             PHA               ; PUT BACK ON STACK
-            ; STA  (IOBPL),Y    ; SAVE 'NEW SLOT NUMBER'
             sta OSLOT
             LDA  Q7L,X        ; GO INTO READ MODE
 STILLON     LDY  #$08         ; TO BE SURE, DATA MUST REMAIN
@@ -1343,12 +1300,6 @@ ITISON
             LDA  MOTORON,X    ; TURN ON MOTOR REGARDLESS
 
 ; copy DISK_DCTPTR and DISK_BUFFPTR to PTRSDEST (=DEVCTBL)
-            ; LDY  #6           ; MOVE OUT ALL POINTERS INTO ZPAGE
-;PTRMOV      ; LDA  (IOBPL),Y
-            ; STA  PTRSDEST-6,Y
-            ; INY
-            ; CPY  #$0A         ; MOVED ALL POINTERS?
-            ; BNE  PTRMOV
             ldy #0
 ptrcopy     lda DISK_DCTPTR,y
             sta PTRSDEST,y
@@ -1356,19 +1307,11 @@ ptrcopy     lda DISK_DCTPTR,y
             cpy #4
             bne ptrcopy
 
-            ; LDY  #3           ; SET UP THE
-            ; LDA  (DEVCTBL),Y  ; MOTOR-ON TIME
             lda DISK_VOL      ; SET UP THE MOTOR-ON TIME
             STA  MONTIME+1
-            ; LDY  #2           ; NOW GET PARAMS
-                              ; NOW GET PARAMS
-            ; LDA  (IOBPL),Y    ; DETERMINE DRIVE ONE OR TWO
             lda DISK_DRIVE      ; DETERMINE DRIVE ONE OR TWO
-            ; LDY  #$10         ; SAME DRIVE USED BEFORE?
-            ; CMP  (IOBPL),Y
             cmp ODRIV           ; SAME DRIVE USED BEFORE?
             BEQ  OK           ; IF SO, DON'T NECESSARILY WAIT FOR MOTOR
-            ; STA  (IOBPL),Y    ; NOW USING THIS DRIVE
             sta ODRIV           ; NOW USING THIS DRIVE
             PLP               ; TELL HIM MOTOR WAS OFF
             LDY  #$00         ; SET ZERO FLAG
@@ -1397,8 +1340,6 @@ NOWAIT
                               ; *
                               ; * SEEK TO DESIRED TRACK...
                               ; *
-            ;LDY  #4           ; SET TO IOBTRK
-            ;LDA  (IOBPL),Y    ; GET DESIRED TRACK
             lda DISK_TRACK    ; GET DESIRED TRACK
             JSR  MYSEEK       ; SEEK!
                               ; *
@@ -1419,124 +1360,7 @@ CONWAIT     DEY
             INC  MONTIME+1
             BNE  MOTOF        ; COUNT UP TO $0000
 MOTORUP
-
-; --------------------------------------------------
-; TRYTRK
-; --------------------------------------------------
-; *
-; * DISK IS NOW UP TO SPEED: READ IT!
-; * NOW CHECK: IF IT IS NOT THE FORMAT DISK COMMAND,
-; * LOCATE THE CORRECT SECTOR FOR THIS OPERATION.
-; *
 TRYTRK
-;             LDY  #$0C
-;             LDA  (IOBPL),Y    ; GET COMMAND CODE #
-;             BEQ  GALLDONE     ; IF NULL COMMAND, GO HOME TO BED.
-;             ; CMP  #$04         ; FORMAT THE DISK?
-;             ; BEQ  FORMDSK      ; ALLRIGHT,ALLRIGHT, I WILL...
-;             ROR               ; SET CARRY=1 FOR READ, 0 FOR WRITE
-;             PHP               ; AND SAVE THAT
-;             BCS  TRYTRK2      ; MUST PRENIBBLIZE FOR WRITE.
-;             JSR  PRENIB16
-; TRYTRK2     LDY  #$30         ; ONLY 48 RETRIES OF ANY KIND.
-;             STY  RETRYCNT
-; TRYADR      LDX  SLOT         ; GET SLOT NUM INTO X-REG
-;             JSR  RDADR16      ; READ NEXT ADDRESS FIELD
-;             BCC  RDRIGHT      ; IF READ IT RIGHT, HURRAH!
-; TRYADR2     DEC  RETRYCNT     ; ANOTHER MISTAEK!!
-
-;             BPL  TRYADR       ; WELL, LET IT GO THIS TIME.,
-;                               ; *
-;                               ; * RRRRRECALIBRATE !!!!
-;                               ; *
-; RECAL
-;             LDA  CURTRK
-;             PHA               ; SAVE TRACK WE REALLY WANT
-;             LDA  #$60         ; RECALIBRATE ALL OVER AGAIN!
-;             JSR  SETTRK       ; PRETEND TO BE ON TRACK 96
-;             DEC  RECALCNT     ; ONCE TOO MANY??
-;             BEQ  DRVERR       ; TRIED TO RECALIBRATE TOO MANY
-;                               ; TIMES, ERROR!
-;             LDA  #MAXSEEKS    ; RESET THE
-;             STA  SEEKCNT      ; SEEK COUNTER
-;             LDA  #$00
-;             JSR  MYSEEK       ; MOVE TO TRACK 00
-;             PLA
-; RESEEK      JSR  MYSEEK       ; GO TO CORRECT TRACK THIS TIME!
-;             JMP  TRYTRK2      ; LOOP BACK, TRY AGAIN ON THIS TRACK
-;                               ; *
-;                               ; * HAVE NOW READ AN ADDRESS FIELD CORRECTLY.
-;                               ; * MAKE SURE THIS IS THE TRACK, SECTOR, AND VOLUME DESIRED.
-;                               ; *
-; RDRIGHT     LDY  TRACK        ; ON THE RIGHT TRACK?
-;             CPY  CURTRK
-;             BEQ  RTTRK        ; IF SO, GOOD
-;                               ; * NO, DRIVE WAS ON A DIFFERENT TRACK. TRY
-;                               ; * RESEEKING/RECALIBRATING FROM THIS TRACK
-;             LDA  CURTRK      ; PRESERVE DESTINATION TRACK
-;             PHA
-;             TYA
-;             JSR  SETTRK
-;             PLA
-;             DEC  SEEKCNT      ; SHOULD WE RESEEK?
-;             BNE  RESEEK       ; =>YES, RESEEK
-;             BEQ  RECAL        ; =>NO, RECALIBRATE!
-;                               ; ***
-; DRVERR      PLA               ; REMOVE CURTRK.
-;             LDA  #DISK_ERR_DRIVE ; BAD DRIVE ERROR
-; JMPTO1      PLP
-;             JMP  HNDLERR
-; GALLDONE    BEQ  ALLDONE
-;                               ; ; ; FORMDSK JMP DSKFORM ; =>GO TO IT!
-;                               ; *
-;                               ; * DRIVE IS ON RIGHT TRACK, CHECK VOLUME MISMATCH
-;                               ; *
-; RTTRK       LDY  #3           ; IS THE RIGHT DISK IN?
-;             LDA  (IOBPL),Y    ; GET DESIRED VOLUM
-;             PHA               ; PRESERVE DESIRED VOLUME#
-;             LDA  VOLUME       ; GET ACTUAL VOLUME HERE
-;             LDY  #$0E         ; TELL OPSYS WHAT VOLUME WAS THERE
-;             STA  (IOBPL),Y
-;             PLA               ; GET DESIRED VOLUME BACK
-;             BEQ  CORRECTVOL   ; DESIRED VOLUME 00 MATCHES ALL.
-;             CMP  VOLUME
-;             BEQ  CORRECTVOL   ; YUP, IT WAS RIGHT
-;             LDA  #DISK_ERR_VOL ; HE SWITCHED DISCS!
-;             BNE  JMPTO1       ; ALWAYS TAKEN
-; CORRECTVOL
-;             LDY  #5           ; TO ALLOW FOR INTERLEAVE
-;             LDA  (IOBPL),Y    ; GET REQUESTED (LOGICAL) SECTOR
-;             TAY               ; MOVE TO INDEX REG
-;             LDA  INTRLEAV,Y   ; COMPUTE PHYSICAL SECTOR
-;             CMP  SECT         ; DID WE GET THE SECTOR?
-;             BNE  TRYADR2      ; NO, KEEP TRYING.
-;                               ; *
-;                               ; * HOORAY! WE GOT THE RIGHT SECTOR!
-;                               ; *
-; GOTSECT
-;             PLP
-;             BCC  WRIT         ; CARRY WAS SET FOR READ OPERATION,
-;             JSR  READ16       ; CLEARED FOR WRITE
-;             PHP               ; SAVE STATUS OF READ OPERATION
-;             BCS  TRYADR2      ; CARRY SET UPON RETURN IF BAD READ
-;             PLP               ; CAREFUL OF STACK
-;             LDX  #0           ; SET TO POSTNIBLIZE
-;             STX  T0           ; ALL 256 BYTES OF THE SECTOR
-;             JSR  POSTNB16     ; DECODE INTO REAL WORLD DATA
-;             LDX  SLOT         ; RESTORE SLOTNUM INTO X
-; ALLDONE     CLC
-;             byte $24 ; SKIP OVER NEXT BYTE WITH BIT OPCODE
-; HNDLERR     SEC               ; INDICATE AN ERROR
-;             LDY  #$0D         ; GIVE HIM ERROR#
-;             STA  (IOBPL),Y
-;             LDA  MOTOROFF,X   ; TURN IT OFF...
-;             RTS
-; WRIT
-;             JSR  WRITE16      ; WRITE NYBBLES NOW
-;             BCC  ALLDONE      ; IF NO ERRORS.
-;             LDA  #DISK_ERR_WP ; DISK IS WRITE PROTECTED!!
-;             BCS  HNDLERR      ; ALWAYS TAKEN
-
             rts
 
 
@@ -1577,137 +1401,6 @@ XTOY        TXA
             LSR
             TAY
             RTS
-
-
-; *
-; * THIS SUBROUTINE SETS THE SLOT DEPENDENT TRACK
-; * LOCATION.
-; *
-; SETTRK      PHA               ; PRESERVE DESTINATION TRACK
-;             LDY  #$02
-;             LDA  (IOBPL),Y
-;             ROR               ; GET DRIVE # INTO CARRY
-;             ROR  DRIVNO       ; INTO (DRIVNO)
-;             JSR  XTOY         ; SET UP Y-REG
-;             PLA
-;             ASL               ; ASSUME TRACK IS HELD *2
-; SETTRK2     BIT  DRIVNO
-;             BMI  ONDRV1       ; IF ON DRIVE 1(1), DRIVNO MINUS
-;             STA  DRV2TRK,Y
-;             BPL  SETRTS
-; ONDRV1      STA  DRV1TRK,Y
-; SETRTS      RTS
-
-
-
-; --------------------------------------------------
-; READ16
-; --------------------------------------------------
-
-; READ16      LDY  #$20         ; 'MUST FIND' COUNT.
-; RSYNC       DEY               ; IF CAN'T FIND MARKS
-;             BEQ  RDERR        ; THEN EXIT WITH CARRY SET.
-; READ1       LDA  Q6L,X        ; READ NIBL.
-;             BPL  READ1        ; *** NO PAGE CROSS! ***
-; RSYNC1      EOR  #$D5         ; DATA MARK 1?
-;             BNE  RSYNC        ; LOOP IF NOT.
-;             NOP               ; DELAY BETWEEN NIBLS.
-; READ2       LDA  Q6L,X
-;             BPL  READ2        ; *** NO PAGE CROSS! ***
-;             CMP  #$AA         ; DATA MARK 2?
-;             BNE  RSYNC1       ; (IF NOT, IS IT DM1?)
-;             LDY  #$56         ; INIT NBUF2 INDEX.
-;                                 ; * (ADDED NIBL DELAY)
-; READ3       LDA  Q6L,X
-;             BPL  READ3        ; *** NO PAGE CROSS! ***
-;             CMP  #$AD         ; DATA MARK 3?
-;             BNE  RSYNC1       ; (IF NOT, IS IT DM1?)
-;                                ; * (CARRY SET IF DM3!)
-;             LDA  #$00         ; INIT CHECKSUM.
-; RDATA1      DEY
-;             STY  IDX
-; READ4       LDY  Q6L,X
-;             BPL  READ4        ; *** NO PAGE CROSS! ***
-;             EOR  DNIBL,Y      ; XOR 6-BIT NIBL.
-;             LDY  IDX
-;             STA  NBUF2,Y      ; STORE IN NBUF2 PAGE.
-;             BNE  RDATA1       ; TAKEN IF Y-REG NONZERO.
-; RDATA2      STY  IDX
-; READ5       LDY  Q6L,X
-;             BPL  READ5        ; *** NO PAGE CROSS! ***
-;             EOR  DNIBL,Y      ; XOR 6-BIT NIBL.
-;             LDY  IDX
-;             STA  NBUF1,Y      ; STORE IN NBUF1 PAGE.
-;             INY
-;             BNE  RDATA2
-; READ6       LDY  Q6L,X        ; READ 7-BIT CSUM NIBL.
-;             BPL  READ6        ; *** NO PAGE CROSS! ***
-;             CMP  DNIBL,Y      ; IF LAST NBUF1 NIBL NOT
-;             BNE  RDERR        ; EQUAL CHKSUM NIBL THEN ERR.
-; READ7       LDA  Q6L,X
-;             BPL  READ7        ; *** NO PAGE CROSS! ***
-;             CMP  #$DE         ; FIRST BIT SLIP MARK?
-;             BNE  RDERR        ; (ERR IF NOT)
-;             NOP               ; DELAY BETWEEN NIBLS.
-; READ8       LDA  Q6L,X
-;             BPL  READ8        ; *** NO PAGE CROSS! ***
-;             CMP  #$AA         ; SECOND BIT SLIP MARK?
-;             BEQ  RDEXIT       ; (DONE IF IT IS)
-; RDERR       SEC               ; INDICATE 'ERROR EXIT'.
-;             RTS               ; RETURN FROM READ16 OR RDADR16.
-
-; --------------------------------------------------
-; RDADR16
-; --------------------------------------------------
-; RDADR16     LDY  #$FC
-;             STY  COUNT        ; 'MUST FIND' COUNT.
-; RDASYN      INY
-;             BNE  RDA1         ; LOW ORDER OF COUNT.
-;             INC  COUNT        ; (2K NIBLS TO FIND
-;             BEQ  RDERR        ; ADR MARK, ELSE ERR)
-; RDA1        LDA  Q6L,X        ; READ NIBL.
-;             BPL  RDA1         ; *** NO PAGE CROSS! ***
-; RDASN1      CMP  #$D5         ; ADR MARK 1?
-;             BNE  RDASYN       ; (LOOP IF NOT)
-;             NOP               ; ADDED NIBL DELAY.
-; RDA2        LDA  Q6L,X
-;             BPL  RDA2         ; *** NO PAGE CROSS! ***
-;             CMP  #$AA         ; ADR MARK 2?
-;             BNE  RDASN1       ; (IF NOT, IS IT AM1?)
-;             LDY  #$3          ; INDEX FOR 4-BYTE READ.
-;                               ; * (ADDED NIBL DELAY)
-; RDA3        LDA  Q6L,X
-;             BPL  RDA3         ; *** NO PAGE CROSS! ***
-;             CMP  #$96         ; ADR MARK 3?
-;             BNE  RDASN1       ; (IF NOT, IS IT AM1?)
-;                               ; * (LEAVES CARRY SET!)
-;             LDA  #$0          ; INIT CHECKSUM.
-; RDAFLD      STA  CSUM
-; RDA4        LDA  Q6L,X        ; READ 'ODD BIT' NIBL.
-;             BPL  RDA4         ; *** NO PAGE CROSS! ***
-;             ROL               ; ALIGN ODD BITS, '1' INTO LSB.
-;             STA  LAST         ; (SAVE THEM)
-; RDA5        LDA  Q6L,X        ; READ 'EVEN BIT' NIBL.
-;             BPL  RDA5         ; *** NO PAGE CROSS! ***
-;             AND  LAST         ; MERGE ODD AND EVEN BITS.
-;             STA  CSSTV,Y      ; STORE DATA BYTE.
-;             EOR  CSUM         ; XOR CHECKSUM.
-;             DEY
-;             BPL  RDAFLD       ; LOOP ON 4 DATA BYTES.
-;             TAY               ; IF FINAL CHECKSUM
-;             BNE  RDERR        ; NONZERO, THEN ERROR.
-; RDA6        LDA  Q6L,X        ; FIRST BIT-SLIP NIBL.
-;             BPL  RDA6         ; *** NO PAGE CROSS! ***
-;             CMP  #$DE
-;             BNE  RDERR        ; ERROR IF NONMATCH.
-;             NOP               ; DELAY BETWEEN NIBLS.
-; RDA7        LDA  Q6L,X        ; SECOND BIT-SLIP NIBL.
-;             BPL  RDA7         ; *** NO PAGE CROSS! ***
-;             CMP  #$AA
-;             BNE  RDERR        ; ERROR IF NONMATCH.
-; RDEXIT      CLC               ; CLEAR CARRY ON
-;             RTS               ; NORMAL
-
 
 ; --------------------------------------------------
 ; MSWAIT
@@ -1827,12 +1520,6 @@ CLRPHASE
             LDX  SLOTTEMP     ; RESTORE X-REG
 SEEKRTS     RTS
 
-; INTRLEAV
-;             byte $00,$0D,$0B,$09
-;             byte $07,$05,$03,$01
-;             byte $0E,$0C,$0A,$08
-;             byte $06,$04,$02,$0F
-
 ONTABLE     byte 1,$30,$28
             byte $24,$20,$1E
             byte $1D,$1C,$1C
@@ -1842,35 +1529,9 @@ OFFTABLE    byte $70,$2C,$26
             byte $1D,$1C,$1C
             byte $1C,$1C,$1C
 
-; ***************************
-; * 7-BIT TO 6-BIT          *
-; * 'DENIBLIZE' TABL        *
-; * (16-SECTOR FORMAT)      *
-; *                         *
-; * VALID CODES             *
-; * $96 TO $FF ONLY.        *
-; *                         *
-; *                         *
-; * CODES WITH MORE THAN    *
-; * ONE PAIR OF ADJACENT    *
-; * ZEROES OR WITH NO       *
-; * ADJACENT ONES (EXCEPT   *
-; * BIT 7) ARE EXCLUDED.    *
-; *                         *
-; * THIS TABLE *MUST* BE    *
-; * ALIGNED AT THE END OF   *
-; * A PAGE IN MEMORY!!!     *
-; ***************************
-XP          EQU <* ; CURRENT PAGE ADDRESS
-DNIBL       EQU 256*XP ; DNIBL TABLE PAGE
-
 
 NBUF1       DS 256,0 ; NBUF1
 NBUF2       DS 86,0 ; NBUF2
-
-WRITE16     rts               ; TODO
-POSTNB16    rts               ; TODO
-PRENIB16    rts               ; TODO
 
 PGM_END
 ; Don't add instructions after this line
