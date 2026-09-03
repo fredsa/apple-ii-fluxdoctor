@@ -142,7 +142,7 @@ DISK_TRACK  equ  $B7EC
 DISK_SECTOR equ  $B7ED
 ; ; ; IBSECT DFB 0 ; SECTOR NUMBER
 
-;                $B7EE ; Low-order byte of device characteristic table (DCT)
+DISK_DCTPTR equ  $B7EE ; Low-order byte of device characteristic table (DCT)
 ;                $B7EF ; High-order byte of DCT
 ; ; ; IBDCTP DW DCT
 
@@ -1226,18 +1226,18 @@ text_rows
 ; --------------------------------------------------
 ; RWTS
 ; --------------------------------------------------
-IOBPL       EQU $48 ; pointer to DISK_IOB
-IOBPH       EQU $49 ;
+;IOBPL       EQU $48 ; pointer to DISK_IOB
+;IOBPH       EQU $49 ;
 
 
 SLOT        EQU $5F8 ; HOLDS SLOT NUM USED
 PTRSDEST    EQU $3C
 DEVCTBL     EQU PTRSDEST
 ; DRIVNO EQU $35
-MAXSEEKS    EQU 4 ; MAX FOR SEEKCNT
-SEEKCNT     EQU $4F8 ; # RESEEKS BEFORE RECALIBRATE
-RETRYCNT    EQU $578
-RECALCNT    EQU $6F8 ; # RECALIBRATES -1
+;MAXSEEKS    EQU 4 ; MAX FOR SEEKCNT
+;SEEKCNT     EQU $4F8 ; # RESEEKS BEFORE RECALIBRATE
+;RETRYCNT    EQU $578
+;RECALCNT    EQU $6F8 ; # RECALIBRATES -1
 
 ; --------------------------------------------------
 ; RDADR16
@@ -1280,17 +1280,19 @@ IDX         EQU $26 ; INDEX INTO (BUF).
 ; --------------------------------------------------
 ; RWTS
 ; --------------------------------------------------
-RWTS        STY  IOBPL        ; UPON ENTRY, A&Y POINT AT THE
-            STA  IOBPH        ; I/O CONTROL BLOCK (IOB)
-            LDY  #2           ; SET RECALIBRATE
-            STY  RECALCNT     ; COUNT
-            LDY  #MAXSEEKS    ; SET RESEEK
-            STY  SEEKCNT      ; COUNT
-            LDY  #1           ; GET SLOT # FOR THIS OPERATION
-            LDA  (IOBPL),Y
+RWTS        ;STY  IOBPL        ; UPON ENTRY, A&Y POINT AT THE
+            ;STA  IOBPH        ; I/O CONTROL BLOCK (IOB)
+            ;LDY  #2           ; SET RECALIBRATE
+            ;STY  RECALCNT     ; COUNT
+            ;LDY  #MAXSEEKS    ; SET RESEEK
+            ;STY  SEEKCNT      ; COUNT
+            ; LDY  #1           ; GET SLOT # FOR THIS OPERATION
+            ; LDA  (IOBPL),Y
+            lda DISK_SLOT     ; GET SLOT # FOR THIS OPERATION
             TAX
-            LDY  #$0F         ; DID HE CHANGE SLOTS?
-            CMP  (IOBPL),Y
+            ; LDY  #$0F         ; DID HE CHANGE SLOTS?
+            ; CMP  (IOBPL),Y
+            cmp OSLOT         ; DID HE CHANGE SLOTS?
             BEQ  SAMESLOT     ; IF HE DIDN'T, GOOD FOR HIM!
 ; *
 ; * NOW ARE USING A DIFFERENT SLOT.
@@ -1299,11 +1301,13 @@ RWTS        STY  IOBPL        ; UPON ENTRY, A&Y POINT AT THE
 ; * BE THE SAME FOR AT LEAST 96 MICROSECONDS
             TXA               ; SAVE NEW SLOT #
             PHA
-            LDA  (IOBPL),Y    ; GET 'OLD SLOT NUMBER'
+            ; LDA  (IOBPL),Y    ; GET 'OLD SLOT NUMBER'
+            lda OSLOT
             TAX
             PLA
             PHA               ; PUT BACK ON STACK
-            STA  (IOBPL),Y    ; SAVE 'NEW SLOT NUMBER'
+            ; STA  (IOBPL),Y    ; SAVE 'NEW SLOT NUMBER'
+            sta OSLOT
             LDA  Q7L,X        ; GO INTO READ MODE
 STILLON     LDY  #$08         ; TO BE SURE, DATA MUST REMAIN
             LDA  Q6L,X        ; STABLE FOR 96 MICROSECONDS
@@ -1337,21 +1341,35 @@ CHKIFON     LDA  Q6L,X        ; GET THE DATA
 ITISON
             PHP               ; SAVE TEST RESULTS
             LDA  MOTORON,X    ; TURN ON MOTOR REGARDLESS
-            LDY  #6           ; MOVE OUT ALL POINTERS INTO ZPAGE
-PTRMOV      LDA  (IOBPL),Y
-            STA  PTRSDEST-6,Y
-            INY
-            CPY  #$0A         ; MOVED ALL POINTERS?
-            BNE  PTRMOV
-            LDY  #3           ; SET UP THE
-            LDA  (DEVCTBL),Y  ; MOTOR-ON TIME
+
+; copy DISK_DCTPTR and DISK_BUFFPTR to PTRSDEST (=DEVCTBL)
+            ; LDY  #6           ; MOVE OUT ALL POINTERS INTO ZPAGE
+;PTRMOV      ; LDA  (IOBPL),Y
+            ; STA  PTRSDEST-6,Y
+            ; INY
+            ; CPY  #$0A         ; MOVED ALL POINTERS?
+            ; BNE  PTRMOV
+            ldy #0
+ptrcopy     lda DISK_DCTPTR,y
+            sta PTRSDEST,y
+            iny
+            cpy #4
+            bne ptrcopy
+
+            ; LDY  #3           ; SET UP THE
+            ; LDA  (DEVCTBL),Y  ; MOTOR-ON TIME
+            lda DISK_VOL      ; SET UP THE MOTOR-ON TIME
             STA  MONTIME+1
-            LDY  #2           ; NOW GET PARAMS
-            LDA  (IOBPL),Y    ; DETERMINE DRIVE ONE OR TWO
-            LDY  #$10         ; SAME DRIVE USED BEFORE?
-            CMP  (IOBPL),Y
+            ; LDY  #2           ; NOW GET PARAMS
+                              ; NOW GET PARAMS
+            ; LDA  (IOBPL),Y    ; DETERMINE DRIVE ONE OR TWO
+            lda DISK_DRIVE      ; DETERMINE DRIVE ONE OR TWO
+            ; LDY  #$10         ; SAME DRIVE USED BEFORE?
+            ; CMP  (IOBPL),Y
+            cmp ODRIV           ; SAME DRIVE USED BEFORE?
             BEQ  OK           ; IF SO, DON'T NECESSARILY WAIT FOR MOTOR
-            STA  (IOBPL),Y    ; NOW USING THIS DRIVE
+            ; STA  (IOBPL),Y    ; NOW USING THIS DRIVE
+            sta ODRIV           ; NOW USING THIS DRIVE
             PLP               ; TELL HIM MOTOR WAS OFF
             LDY  #$00         ; SET ZERO FLAG
             PHP
@@ -1379,8 +1397,9 @@ NOWAIT
                               ; *
                               ; * SEEK TO DESIRED TRACK...
                               ; *
-            LDY  #4           ; SET TO IOBTRK
-            LDA  (IOBPL),Y    ; GET DESIRED TRACK
+            ;LDY  #4           ; SET TO IOBTRK
+            ;LDA  (IOBPL),Y    ; GET DESIRED TRACK
+            lda DISK_TRACK    ; GET DESIRED TRACK
             JSR  MYSEEK       ; SEEK!
                               ; *
                               ; * SEE IF MOTOR WAS ALREADY SPINNING.
@@ -1518,6 +1537,9 @@ TRYTRK
 ;             LDA  #DISK_ERR_WP ; DISK IS WRITE PROTECTED!!
 ;             BCS  HNDLERR      ; ALWAYS TAKEN
 
+            rts
+
+
 ; *
 ; * THIS IS THE 'SEEK' ROUTINE
 ; * SEEKS TRACK 'N' IN SLOT #X/$10
@@ -1530,7 +1552,7 @@ MYSEEK      PHA               ; AND PRESERVE A-REGISTER
             ROR               ; GET # OF PHASES INTO CARRY
             PLA
             BCC  MYSEEK2      ; IF ONE PHASE PER TRACK
-            ASL
+            ASL               ; 2x track
             JSR  MYSEEK2
             LSR  CURTRK       ; DIVIDE BACK DOWN
             RTS
