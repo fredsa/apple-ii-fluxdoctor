@@ -170,10 +170,6 @@ ODRIV       equ  $B7F8 ; prev drive
 ; ; ; IBPDRV DFB 1 ; PREVIOUS DRIVE
 
 
-; ; ; IBSPAR DS 2,0 ; IOB SPARES
-; ; ; DCT DFB 0,1,$EF,$D8
-; ; ; DS 1,0 ; FILL IN 3700 PAGE
-
 DISK_CMD_SEEK equ $00
 ; ; ; IBCNUL EQU 0 ; 0-NULL COMMAND
 
@@ -1529,9 +1525,13 @@ OFFTABLE    byte $70,$2C,$26
             byte $1D,$1C,$1C
             byte $1C,$1C,$1C
 
-
 NBUF1       DS 256,0 ; NBUF1
-NBUF2       DS 86,0 ; NBUF2
+NBUF2       DS 86,0  ; NBUF2
+
+DCT                ; Device Characteristics Table (DCT)
+    byte $00       ; device type ($00 for Disk II)
+    byte $01       ; phases per track ($01 for DiskII)
+    byte $EF,$D8   ; motor on time count ($EFD8 for DiskII)
 
 PGM_END
 ; Don't add instructions after this line
