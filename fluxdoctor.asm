@@ -198,13 +198,6 @@ DISK_ERR_READ equ $80 ; read error (obsolete)
 ; ; ; IBRERR EQU $80 ; READ ERR
 
 ; --------------------------------------------------
-; Device characteristics table
-; --------------------------------------------------
-; Offset 00  Device type: $OO = Disk II
-; Offset 01  Phases per track: $01 = DISK II
-; Offset 02  Motor on time count: $EFD8 = DISK II
-
-; --------------------------------------------------
 ; Hardware registers
 ; --------------------------------------------------
 KBD         equ  $C000
@@ -1227,14 +1220,7 @@ SLOTTEMP    EQU $2B ; SLOT NUM TIMES $10.
 ; X = slot << 4
 ; A = dest track
 ; DRIVNO = negative: drive 1, positive: drive 2
-MYSEEK      PHA               ; AND PRESERVE A-REGISTER
-            ; LDY  #$01         ; IS THIS A TWO-PHASE DISC?
-            ; LDA  (DEVCTBL),Y
-            lda DCT+1           ; IS THIS A TWO-PHASE DISC?
-            ROR               ; GET # OF PHASES INTO CARRY
-            PLA
-            BCC  MYSEEK2      ; IF ONE PHASE PER TRACK
-            ASL               ; 2x track
+MYSEEK      ASL               ; 2x track
             JSR  MYSEEK2
             LSR  CURTRK       ; DIVIDE BACK DOWN
             RTS
@@ -1389,11 +1375,6 @@ OFFTABLE    byte $70,$2C,$26
 
 NBUF1       DS 256,0 ; NBUF1
 NBUF2       DS 86,0  ; NBUF2
-
-DCT                ; Device Characteristics Table (DCT)
-    byte $00       ; device type ($00 for Disk II)
-    byte $01       ; phases per track ($01 for DiskII)
-    byte $EF,$D8   ; motor on time count ($EFD8 for DiskII)
 
 PGM_END
 ; Don't add instructions after this line
