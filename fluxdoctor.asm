@@ -1292,11 +1292,11 @@ RWTS        STY  IOBPL        ; UPON ENTRY, A&Y POINT AT THE
             LDY  #$0F         ; DID HE CHANGE SLOTS?
             CMP  (IOBPL),Y
             BEQ  SAMESLOT     ; IF HE DIDN'T, GOOD FOR HIM!
-                              ; *
-                              ; * NOW ARE USING A DIFFERENT SLOT.
-                              ; * NOW WAIT FOR THIS DRIVE TO TURN OFF
-                              ; * TO SENSE MOTOR NOT SPINNING, DATA FROM DISK MUST
-                              ; * BE THE SAME FOR AT LEAST 96 MICROSECONDS
+; *
+; * NOW ARE USING A DIFFERENT SLOT.
+; * NOW WAIT FOR THIS DRIVE TO TURN OFF
+; * TO SENSE MOTOR NOT SPINNING, DATA FROM DISK MUST
+; * BE THE SAME FOR AT LEAST 96 MICROSECONDS
             TXA               ; SAVE NEW SLOT #
             PHA
             LDA  (IOBPL),Y    ; GET 'OLD SLOT NUMBER'
