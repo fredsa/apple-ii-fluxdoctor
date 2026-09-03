@@ -969,20 +969,13 @@ seek
             lda  #>DISK_IOB
             ldy  #<DISK_IOB
 
-            ; jsr  RWTS
-
-            lda DISK_DRIVE
+            lda DISK_DRIVE   ; get desired track
             ror
             ror
-            sta DRIVNO
-            lda DISK_TRACK
-            ldx  DISK_SLOT
-; A = dest track
-; X = slot << 4
-; DRIVNO = negative: drive 1, positive: drive 2
+            sta DRIVNO       ; set desired disk (neg=1, pos=2)
+            lda DISK_TRACK   ; set desired track
+            ldx  DISK_SLOT   ; set desired slot
             jsr MYSEEK
-
-
 
             ldx  DISK_SLOT    ; restore X
             lda  MOTORON,x    ; keep motor on
@@ -997,28 +990,6 @@ seekerr     lda  #ERR_CODE_SEEK
 noseekerr
             jsr  showwp
             rts
-
-
-; readsect
-;             lda  #DISK_CMD_READ
-;             sta  DISK_CMD
-
-;             lda  #<DISK_BUFFER
-;             sta  DISK_BUFFPTR
-;             lda  #>DISK_BUFFER
-;             sta  DISK_BUFFPTR+1
-
-;             lda  #>DISK_IOB
-;             ldy  #<DISK_IOB
-;             jsr  RWTS
-;             lda #???
-;             sta RUNNING
-;             bcc  nodiskerr
-; diskerr     lda  #ERR_CODE_SEEK
-;             sta  SEEK_ERR_ADDR
-;             renderhex DISK_ERR,TARGET_ERR_ADDR
-; nodiskerr
-;             rts
 
 
 setdisktrack
@@ -1230,16 +1201,9 @@ text_rows
             word text_row_14,text_row_15,text_row_16,text_row_17
 
 ; --------------------------------------------------
-; RWTS
-; --------------------------------------------------
-;SLOT        EQU $5F8 ; HOLDS SLOT NUM USED
-PTRSDEST    EQU $3C
-DEVCTBL     EQU PTRSDEST
-
-; --------------------------------------------------
 ; MSWAIT
 ; --------------------------------------------------
-MONTIME     EQU $46
+;MONTIME     EQU $46
 MONTIMEL    EQU $46 ; MOTOR-ON TIME
 MONTIMEH    EQU $47 ; COUNTERS.
 
@@ -1251,125 +1215,6 @@ PRIOR       EQU $27 ; PRIOR HALFTRACK.
 TRKN        EQU $2A ; DESIRED TRACK.
 SLOTTEMP    EQU $2B ; SLOT NUM TIMES $10.
 
-
-; --------------------------------------------------
-; RWTS
-; --------------------------------------------------
-RWTS        lda DISK_SLOT     ; GET SLOT # FOR THIS OPERATION
-            TAX
-            cmp OSLOT         ; DID HE CHANGE SLOTS?
-            BEQ  SAMESLOT     ; IF HE DIDN'T, GOOD FOR HIM!
-; *
-; * NOW ARE USING A DIFFERENT SLOT.
-; * NOW WAIT FOR THIS DRIVE TO TURN OFF
-; * TO SENSE MOTOR NOT SPINNING, DATA FROM DISK MUST
-; * BE THE SAME FOR AT LEAST 96 MICROSECONDS
-            TXA               ; SAVE NEW SLOT #
-            PHA
-            lda OSLOT
-            TAX
-            PLA
-            PHA               ; PUT BACK ON STACK
-            sta OSLOT
-            LDA  Q7L,X        ; GO INTO READ MODE
-STILLON     LDY  #$08         ; TO BE SURE, DATA MUST REMAIN
-            LDA  Q6L,X        ; STABLE FOR 96 MICROSECONDS
-NOTSURE     CMP  Q6L,X        ; DATA STILL CHANGING?
-            BNE  STILLON      ; IF SO, STILL SPINNING
-            DEY
-            BNE  NOTSURE      ; STABLE LONG ENOUGH? IF NOT, LOOP
-                              ; *
-                              ; * PREVIOUS SLOT'S DRIVE NOW OFF...
-                              ; *
-            PLA               ; RESTORE NEW SLOT #
-            TAX
-                              ; *
-                              ; * NOW CHECK IF THE MOTOR IS ON, THEN START IT
-                              ; *
-SAMESLOT    LDA  Q7L,X        ; MAKE SURE IN READ MODE
-            LDA  Q6L,X
-            LDY  #8           ; WE MAY HAFTA CHECK SEVERAL TIMES TO
-                              ; BE SURE
-CHKIFON     LDA  Q6L,X        ; GET THE DATA
-            PHA               ; DELAY FOR DISK DATA TO CHANGE
-            PLA
-            PHA
-            PLA
-            ; STX  SLOT
-            stx DISK_SLOT
-            CMP  Q6L,X        ; CHECK RUNNING HERE
-            BNE  ITISON       ; =>IT'S ON...
-            DEY               ; MAYBE WE DIDN'T CATCH IT
-            BNE  CHKIFON      ; SO WE'LL TRY AGAIN
-                              ; *
-ITISON
-            PHP               ; SAVE TEST RESULTS
-            LDA  MOTORON,X    ; TURN ON MOTOR REGARDLESS
-
-; copy DISK_DCTPTR and DISK_BUFFPTR to PTRSDEST (=DEVCTBL)
-            ldy #0
-ptrcopy     lda DISK_DCTPTR,y
-            sta PTRSDEST,y
-            iny
-            cpy #4
-            bne ptrcopy
-
-            lda DISK_VOL      ; SET UP THE MOTOR-ON TIME
-            STA  MONTIME+1
-            lda DISK_DRIVE      ; DETERMINE DRIVE ONE OR TWO
-            cmp ODRIV           ; SAME DRIVE USED BEFORE?
-            BEQ  OK           ; IF SO, DON'T NECESSARILY WAIT FOR MOTOR
-            sta ODRIV           ; NOW USING THIS DRIVE
-            PLP               ; TELL HIM MOTOR WAS OFF
-            LDY  #$00         ; SET ZERO FLAG
-            PHP
-OK          ROR               ; BY GOING INTO THE CARRY
-            BCC  SD1          ; SELECT DRIVE 2 !
-            LDA  DRV0EN,X     ; ASSUME DRIVE 0 TO HIT
-            BCS  DRVSEL       ; IF WRONG, ENABLE DRIVE 1 INSTEAD
-SD1         LDA  DRV1EN,X
-DRVSEL
-            ROR  DRIVNO       ; SAVE SELECTED DRIVE
-                              ; *
-                              ; * DRIVE SELECTED. IF MOTORING-UP,
-                              ; * WAIT BEFORE SEEKING...
-                              ; *
-            PLP               ; WAS THE MOTOR
-            PHP               ; PREVIOUSLY OFF?
-            BNE  NOWAIT       ; =>NO, FORGET WAITING.
-            LDY  #7           ; YES, DELAY 150 MS
-SEEKW       JSR  MSWAIT
-            DEY
-            BNE  SEEKW
-            ; LDX  SLOT         ; RESTORE SLOT NUMBER
-            ldx DISK_SLOT
-                              ; *
-NOWAIT
-                              ; *
-                              ; * SEEK TO DESIRED TRACK...
-                              ; *
-            lda DISK_TRACK    ; GET DESIRED TRACK
-            JSR  MYSEEK       ; SEEK!
-                              ; *
-                              ; * SEE IF MOTOR WAS ALREADY SPINNING.
-                              ; *
-            PLP               ; WAS MOTOR ON?
-            ; BNE  TRYTRK       ; IF SO, DON'T DELAY, GET IT TODAY!
-                              ; ; *
-                              ; ; * WAIT FOR MOTOR SPEED TO COME UP.
-                              ; ; *
-            ; LDY  MONTIME+1    ; IF MOTORTIME IS POSITIVE,
-            ; BPL  MOTORUP      ; THEN SEEK WASTED ENUFF TIME FOR US
-; MOTOF       LDY  #$12         ; DELAY 100 USEC PER COUNT
-; CONWAIT     DEY
-            ; BNE  CONWAIT
-            ; INC  MONTIME
-            ; BNE  MOTOF
-            ; INC  MONTIME+1
-            ; BNE  MOTOF        ; COUNT UP TO $0000
-; MOTORUP
-TRYTRK
-            rts
 
 
 ; *
