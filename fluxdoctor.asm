@@ -93,11 +93,6 @@ COUT        equ  $FDED
 CROUT       equ  $FD8E
 
 ; --------------------------------------------------
-; DOS routines
-; --------------------------------------------------
-; RWTS        equ  $3D9
-
-; --------------------------------------------------
 ; DOS data
 ; --------------------------------------------------
 DRIVNO      equ  $35
@@ -973,7 +968,22 @@ seek
             sta  DISK_CMD
             lda  #>DISK_IOB
             ldy  #<DISK_IOB
-            jsr  RWTS
+
+            ; jsr  RWTS
+
+            lda DISK_DRIVE
+            ror
+            ror
+            sta DRIVNO
+            lda DISK_TRACK
+            ldx  DISK_SLOT
+; A = dest track
+; X = slot << 4
+; DRIVNO = negative: drive 1, positive: drive 2
+            jsr MYSEEK
+
+
+
             ldx  DISK_SLOT    ; restore X
             lda  MOTORON,x    ; keep motor on
             lda  #CODE_Y
@@ -1222,7 +1232,7 @@ text_rows
 ; --------------------------------------------------
 ; RWTS
 ; --------------------------------------------------
-SLOT        EQU $5F8 ; HOLDS SLOT NUM USED
+;SLOT        EQU $5F8 ; HOLDS SLOT NUM USED
 PTRSDEST    EQU $3C
 DEVCTBL     EQU PTRSDEST
 
@@ -1285,7 +1295,8 @@ CHKIFON     LDA  Q6L,X        ; GET THE DATA
             PLA
             PHA
             PLA
-            STX  SLOT
+            ; STX  SLOT
+            stx DISK_SLOT
             CMP  Q6L,X        ; CHECK RUNNING HERE
             BNE  ITISON       ; =>IT'S ON...
             DEY               ; MAYBE WE DIDN'T CATCH IT
@@ -1330,7 +1341,8 @@ DRVSEL
 SEEKW       JSR  MSWAIT
             DEY
             BNE  SEEKW
-            LDX  SLOT         ; RESTORE SLOT NUMBER
+            ; LDX  SLOT         ; RESTORE SLOT NUMBER
+            ldx DISK_SLOT
                               ; *
 NOWAIT
                               ; *
@@ -1342,20 +1354,20 @@ NOWAIT
                               ; * SEE IF MOTOR WAS ALREADY SPINNING.
                               ; *
             PLP               ; WAS MOTOR ON?
-            BNE  TRYTRK       ; IF SO, DON'T DELAY, GET IT TODAY!
-                              ; *
-                              ; * WAIT FOR MOTOR SPEED TO COME UP.
-                              ; *
-            LDY  MONTIME+1    ; IF MOTORTIME IS POSITIVE,
-            BPL  MOTORUP      ; THEN SEEK WASTED ENUFF TIME FOR US
-MOTOF       LDY  #$12         ; DELAY 100 USEC PER COUNT
-CONWAIT     DEY
-            BNE  CONWAIT
-            INC  MONTIME
-            BNE  MOTOF
-            INC  MONTIME+1
-            BNE  MOTOF        ; COUNT UP TO $0000
-MOTORUP
+            ; BNE  TRYTRK       ; IF SO, DON'T DELAY, GET IT TODAY!
+                              ; ; *
+                              ; ; * WAIT FOR MOTOR SPEED TO COME UP.
+                              ; ; *
+            ; LDY  MONTIME+1    ; IF MOTORTIME IS POSITIVE,
+            ; BPL  MOTORUP      ; THEN SEEK WASTED ENUFF TIME FOR US
+; MOTOF       LDY  #$12         ; DELAY 100 USEC PER COUNT
+; CONWAIT     DEY
+            ; BNE  CONWAIT
+            ; INC  MONTIME
+            ; BNE  MOTOF
+            ; INC  MONTIME+1
+            ; BNE  MOTOF        ; COUNT UP TO $0000
+; MOTORUP
 TRYTRK
             rts
 
@@ -1366,9 +1378,14 @@ TRYTRK
 ; * IF DRIVNO IS NEGATIVE, ON DRIVE 1
 ; * IF DRIVNO IS POSITIVE, ON DRIVE 2
 ; *
+
+; X = slot << 4
+; A = dest track
+; DRIVNO = negative: drive 1, positive: drive 2
 MYSEEK      PHA               ; AND PRESERVE A-REGISTER
-            LDY  #$01         ; IS THIS A TWO-PHASE DISC?
-            LDA  (DEVCTBL),Y
+            ; LDY  #$01         ; IS THIS A TWO-PHASE DISC?
+            ; LDA  (DEVCTBL),Y
+            lda DCT+1           ; IS THIS A TWO-PHASE DISC?
             ROR               ; GET # OF PHASES INTO CARRY
             PLA
             BCC  MYSEEK2      ; IF ONE PHASE PER TRACK
