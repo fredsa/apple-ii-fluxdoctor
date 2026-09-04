@@ -843,16 +843,16 @@ endtouchsect
             sta  touchsect_addr,x
             rts
 
-printnibble
-            stx  SAVEX
-            pha
-            and  #$0f
-            tax
-            lda  hexchars,x
-            jsr  COUT
-            pla
-            ldx  SAVEX
-            rts
+; printnibble
+;             stx  SAVEX
+;             pha
+;             and  #$0f
+;             tax
+;             lda  hexchars,x
+;             jsr  COUT
+;             pla
+;             ldx  SAVEX
+;             rts
 
 ; printhex
 ;             stx  SAVEX
