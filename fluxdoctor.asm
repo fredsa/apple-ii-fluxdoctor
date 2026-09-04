@@ -118,84 +118,38 @@ DRV2TRK     equ  $4F8
 ; --------------------------------------------------
 ; IOB table
 ; --------------------------------------------------
-IOB
 DISK_IOB    equ  $B7E8 ; IOB type indicator, must be $01
-; ; ; IBTYPE DFB 1 ; IOB TYPE CODE
-
 DISK_SLOT   equ  $B7E9 ; Slot << 4
-; ; ; IBSLOT DFB 6*16 ; CONTROLLER SLOT NO.
-
 DISK_DRIVE  equ  $B7EA
-; ; ; IBDRVN DFB 1 ; DRIVE NUMBER
-
-DISK_VOL    equ  $B7EB ; Volume $01 - $FE, $00 = any
-; ; ; IBVOL DFB $00 ; VOLUME NUMBER
-
+;DISK_VOL    equ  $B7EB ; Volume $01 - $FE, $00 = any
 DISK_TRACK  equ  $B7EC
-; ; ; IBTRK DFB 0 ; TRACK NUMBER
-
-DISK_SECTOR equ  $B7ED
-; ; ; IBSECT DFB 0 ; SECTOR NUMBER
-
-DISK_DCTPTR equ  $B7EE ; Low-order byte of device characteristic table (DCT)
+;DISK_SECTOR equ  $B7ED
+;DISK_DCTPTR equ  $B7EE ; Low-order byte of device characteristic table (DCT)
 ;                $B7EF ; High-order byte of DCT
-; ; ; IBDCTP DW DCT
-
-DISK_BUFFPTR equ $B7F0 ; data buffer pointer
+;DISK_BUFFPTR equ $B7F0 ; data buffer pointer
 ;                $B7F1
-; ; ; IBBUFP DW 0 ; POINTER TO BUFFER
 
-;                $B7F2 ; data length
+;DISK_BUFFLEN    $B7F2 ; data length
 ;                $B7F3 ;
-; ; ; IBDLEN DW 256 ; DATA LENGTH
 
-DISK_CMD    equ  $B7F4 ; disk command
-; ; ; IBCMD DFB 0 ; COMMAND
-
-DISK_ERR    equ  $B7F5 ; status error code (or last byte of bufer read in)
-; ; ; IBSTAT DFB 0 ; STATUS
-
+;DISK_CMD    equ  $B7F4 ; disk command
+;DISK_ERR    equ  $B7F5 ; status error code (or last byte of bufer read in)
 ;                $B7F6 ; actual volume (or status modifier?)
-; ; ; IBSMOD DFB 0 ; STATUS MODIFIER BYTE
+;OSLOT       equ  $B7F7 ; previous slot << 4
+;ODRIV       equ  $B7F8 ; previous drive
 
-OSLOT       equ  $B7F7 ; prev slot << 4
-; ; ; IBPSLT DFB 6*16 ; PREVIOUS SLOT
+;DISK_CMD_SEEK equ $00
+;DISK_CMD_READ equ $01
+;DISK_CMD_WRITE equ $02
+;DISK_CMD_FORMAT equ $04
+;DISK_CMD_WRITE_BOOT equ $08
 
-ODRIV       equ  $B7F8 ; prev drive
-; ; ; IBPDRV DFB 1 ; PREVIOUS DRIVE
-
-
-DISK_CMD_SEEK equ $00
-; ; ; IBCNUL EQU 0 ; 0-NULL COMMAND
-
-DISK_CMD_READ equ $01
-; ; ; IBCRTS EQU 1 ; 1-READ TRACK, SECTOR
-
-DISK_CMD_WRITE equ $02
-; ; ; IBCWTS EQU 2 ; 2-WRITE TRACK, SECTOR
-
-DISK_CMD_FORMAT equ $04
-; ; ; IBFMT EQU 4 ; 4-FORMAT DISK
-
-DISK_CMD_WRITE_BOOT equ $08
-; ; ; IBBOOT EQU 8 ; 8-WRITE BOOT
-
-
-DISK_ERR_NONE equ $00 ; no errors
-
-DISK_ERR_INIT equ $08 ; error during initialization
-
-DISK_ERR_WP equ  $10  ; write protect error
-; ; ; IBWPER EQU $10 ; WRITE PROTECT ERROR
-
-DISK_ERR_VOL equ $20  ; volume mismatch error
-; ; ; IBVMME EQU $20 ; VOLUME MISMATCH
-
-DISK_ERR_DRIVE equ $40 ; drive error
-; ; ; IBDERR EQU $40 ; DRIVE ERR
-
-DISK_ERR_READ equ $80 ; read error (obsolete)
-; ; ; IBRERR EQU $80 ; READ ERR
+;DISK_ERR_NONE equ $00 ; no errors
+;DISK_ERR_INIT equ $08 ; error during initialization
+;DISK_ERR_WP equ  $10  ; write protect error
+;DISK_ERR_VOL equ $20  ; volume mismatch error
+;DISK_ERR_DRIVE equ $40 ; drive error
+;DISK_ERR_READ equ $80 ; read error (obsolete)
 
 ; --------------------------------------------------
 ; Hardware registers
@@ -203,13 +157,13 @@ DISK_ERR_READ equ $80 ; read error (obsolete)
 KBD         equ  $C000
 KBDSTRB     equ  $C010
 PHASEOFF    equ  $C080 ; ($Cx80 slot 1-7) Stepper motor phase 0 off
-PHASEON     equ  $C081 ; ($Cx81 slot 1-7) Stepper motor phase 0 on
-PHASE1OFF   equ  $C082 ; ($Cx82 slot 1-7) Stepper motor phase 1 off
-PHASElON    equ  $C083 ; ($Cx83 slot 1-7) Stepper motor phase I on
-PHASE2OFF   equ  $C084 ; ($Cx84 slot 1-7) Stepper motor phase 2 off
-PHASE2ON    equ  $C085 ; ($Cx85 slot 1-7) Stepper notor phase 2 on
-PHASE3OFF   equ  $C086 ; ($Cx86 slot 1-7) Stepper motor phase 3 off
-PHASE3ON    equ  $C087 ; ($Cx87 slot 1-7) Stepper motor phase 3 on
+;PHASEON     equ  $C081 ; ($Cx81 slot 1-7) Stepper motor phase 0 on
+;PHASE1OFF   equ  $C082 ; ($Cx82 slot 1-7) Stepper motor phase 1 off
+;PHASElON    equ  $C083 ; ($Cx83 slot 1-7) Stepper motor phase I on
+;PHASE2OFF   equ  $C084 ; ($Cx84 slot 1-7) Stepper motor phase 2 off
+;PHASE2ON    equ  $C085 ; ($Cx85 slot 1-7) Stepper notor phase 2 on
+;PHASE3OFF   equ  $C086 ; ($Cx86 slot 1-7) Stepper motor phase 3 off
+;PHASE3ON    equ  $C087 ; ($Cx87 slot 1-7) Stepper motor phase 3 on
 MOTOROFF    equ  $C088 ; ($Cx88 slot 1-7) Turn motor off
 MOTORON     equ  $C089 ; ($Cx89 slot 1-7) Turn motor on
 DRV0EN      equ  $C08A ; ($Cx8A slot 1-7) Drive 0 select
@@ -217,7 +171,8 @@ DRV1EN      equ  $C08B ; ($Cx8B slot 1-7) Drive 1 select
 Q6L         equ  $C08C ; ($Cx8C slot 1-7) READ data latch
 Q6H         equ  $C08D ; ($Cx8D slot 1-7) WRITE data latch; read write protect state
 Q7L         equ  $C08E ; ($Cx8E slot 1-7) Set READ mode
-Q7H         equ  $C08F ; ($Cx8F slot 1-7) Set WRITE mode
+;Q7H         equ  $C08F ; ($Cx8F slot 1-7) Set WRITE mode
+
 ; Q7L Q6L = Read data
 ; Q7H Q6L = Write data
 ; Q7L Q6H = Sense Write Protect
@@ -234,7 +189,7 @@ PROLOGUE_2_ADDR equ $96
 PROLOGUE_2_DATA equ $AD
 EPILOGUE_0  equ  $DE
 EPILOGUE_1  equ  $AA
-EPILOGUE_2  equ  $EB
+;EPILOGUE_2  equ  $EB
 
 ; --------------------------------------------------
 ; Keyboard scan codes
@@ -467,16 +422,6 @@ prepmap2    lda  dos33_6and2,y
             sta  MAP_6AND2,x  ; populate reverse map
             dey
             bpl  prepmap2
-
-
-            ; --------------------------------------------------
-            ; Init IOB
-            ; --------------------------------------------------
-            lda  #$01
-            sta  DISK_IOB
-
-            lda  #$00         ; Any volume
-            sta  DISK_VOL
 
 
             ; --------------------------------------------------
