@@ -907,6 +907,7 @@ renderdatachecksumbad
 ; --------------------------------------------------
 seek
             jsr  resetscreen
+            printmessage M_BAD_TRACK_OK
 
             lda DISK_DRIVE   ; get desired track
             ror
