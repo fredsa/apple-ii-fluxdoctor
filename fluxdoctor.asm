@@ -545,6 +545,11 @@ nozero
             jmp  nokey
 nofour
 
+            cmp #'R
+            bne nor
+            jsr fixtrack
+nor
+
             cmp  #$1B         ; ESC
             bne  noesc
             lda  #$FF
@@ -915,13 +920,7 @@ seek
             lda  MOTORON,x    ; keep motor on
             lda  #CODE_Y
             sta  RUNNING
-            php
             renderhex DISK_TRACK,TARGET_TRACK_ADDR
-            plp
-            bcc  noseekerr
-seekerr     lda  #ERR_CODE_SEEK
-            sta  SEEK_ERR_ADDR
-noseekerr
             jsr  showwp
             rts
 
@@ -948,33 +947,19 @@ endprevtrack
 maybefixtrack
             lda  FOUND_TRACK
             cmp  DISK_TRACK
-            bne  askfixtrack
-            rts
-askfixtrack
+            beq  nofixtrack
+            lda  SEEK_ERR_ADDR
+            cmp  #ERR_CODE_SEEK
+            beq  nofixtrack ; beep only once
+            lda  #ERR_CODE_SEEK
+            sta  SEEK_ERR_ADDR
             printmessageinv M_BAD_TRACK
-            renderhex FOUND_TRACK,BAD_TRACK_ADDR1
-            renderhex DISK_TRACK,BAD_TRACK_ADDR2
             jsr  BELLB
-maybefixkey lda  KBD
-            bpl  maybefixkey
-            sta  KBDSTRB
-            and  #$7f
-            cmp  #'a
-            bcc  maybefixnocase
-            cmp  #'z+1
-            bcs  maybefixnocase
-            eor  #$20
-maybefixnocase
-            cmp  #$1B         ; ESC
-            bne  maybefixnoesc
-            lda  #$FF
-            sta  EXIT_FLAG
-            jmp  endfixtrack
-maybefixnoesc
-            cmp  #'N
-            beq  endfixtrack
-            cmp  #'Y
-            bne  maybefixkey
+nofixtrack  rts
+
+
+fixtrack
+            printmessage M_BAD_TRACK_OK
             lda  DISK_SLOT
             lsr
             lsr
@@ -997,7 +982,6 @@ maybefixdrivetrack2
 fixtrackseek
             jsr  seek
 endfixtrack
-            printmessage M_BAD_TRACK_OK
             rts
 
 ; --------------------------------------------------
@@ -1060,13 +1044,10 @@ DATA_FIELD_ERR_ADDR_E equ text_row_0a+39
 
 M_BAD_TRACK
             byte $0d, 00 ; ypos, xpos
-            byte "UNEXPECTED TRACK __, SEEK TO __? [Y]/[N]",0
+            byte "UNEXPECTED TRACK. PRESS [R] TO RE-SEEK.",0
 M_BAD_TRACK_OK
             byte $0d, 00 ; ypos, xpos
-            byte "                                        ",0
-BAD_TRACK_ADDR1 equ text_row_0d+17
-BAD_TRACK_ADDR2 equ text_row_0d+29
-
+            byte "                                       ",0
 
 M_INSTRUCTIONS
             byte $0f,$00 ; ypos, xpos
