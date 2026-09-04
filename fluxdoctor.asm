@@ -1186,13 +1186,6 @@ dos33_6and2
             byte $ED, $EE, $EF, $F2, $F3, $F4, $F5, $F6 ; 6-bit values $30 - $37
             byte $F7, $F9, $FA, $FB, $FC, $FD, $FE, $FF ; 6-bit values $38 - $3f
 
-text_rows
-            word text_row_00,text_row_01,text_row_02,text_row_03,text_row_04
-            word text_row_05,text_row_06,text_row_07,text_row_08,text_row_09
-            word text_row_0a,text_row_0b,text_row_0c,text_row_0d,text_row_0e
-            word text_row_0f,text_row_10,text_row_11,text_row_12,text_row_13
-            word text_row_14,text_row_15,text_row_16,text_row_17
-
 ; --------------------------------------------------
 ; MSWAIT
 ; --------------------------------------------------
@@ -1372,9 +1365,6 @@ OFFTABLE    byte $70,$2C,$26
             byte $22,$1F,$1E
             byte $1D,$1C,$1C
             byte $1C,$1C,$1C
-
-NBUF1       DS 256,0 ; NBUF1
-NBUF2       DS 86,0  ; NBUF2
 
 PGM_END
 ; Don't add instructions after this line
