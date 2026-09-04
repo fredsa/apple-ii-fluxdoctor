@@ -957,10 +957,6 @@ renderdatachecksumbad
 ; --------------------------------------------------
 seek
             jsr  resetscreen
-            lda  #DISK_CMD_SEEK
-            sta  DISK_CMD
-            lda  #>DISK_IOB
-            ldy  #<DISK_IOB
 
             lda DISK_DRIVE   ; get desired track
             ror
