@@ -1027,26 +1027,26 @@ CHKSUM_ADDR equ  text_row_04+38
 touchsect_addr equ text_row_06+5
 
 M_DATA_CHECKSUM
-            byte $08,$00 ; ypos, xpos
+            byte $0a,$00 ; ypos, xpos
             byte "SEEK ERR _         DATA CHECKSUM ERR ___",0
-SEEK_ERR_ADDR equ text_row_08+9
-DATA_CHECKSUM_ADDR equ text_row_08+37
+SEEK_ERR_ADDR equ text_row_0a+9
+DATA_CHECKSUM_ADDR equ text_row_0a+37
 
 M_FIELDS
-            byte $0a,$00 ; ypos, xpos
+            byte $0c,$00 ; ypos, xpos
             byte "ADDR FIELD ERR ___    DATA FIELD ERR ___",0
-ADDR_FIELD_ERR_ADDR_M equ text_row_0a+15
-ADDR_FIELD_ERR_ADDR_K equ text_row_0a+16
-ADDR_FIELD_ERR_ADDR_E equ text_row_0a+17
-DATA_FIELD_ERR_ADDR_M equ text_row_0a+37
-DATA_FIELD_ERR_ADDR_K equ text_row_0a+38
-DATA_FIELD_ERR_ADDR_E equ text_row_0a+39
+ADDR_FIELD_ERR_ADDR_M equ text_row_0c+15
+ADDR_FIELD_ERR_ADDR_K equ text_row_0c+16
+ADDR_FIELD_ERR_ADDR_E equ text_row_0c+17
+DATA_FIELD_ERR_ADDR_M equ text_row_0c+37
+DATA_FIELD_ERR_ADDR_K equ text_row_0c+38
+DATA_FIELD_ERR_ADDR_E equ text_row_0c+39
 
 M_BAD_TRACK
-            byte $0d, 00 ; ypos, xpos
+            byte $08, 00 ; ypos, xpos
             byte "UNEXPECTED TRACK. PRESS [R] TO RE-SEEK.",0
 M_BAD_TRACK_OK
-            byte $0d, 00 ; ypos, xpos
+            byte $08, 00 ; ypos, xpos
             byte "                                       ",0
 
 M_INSTRUCTIONS
