@@ -265,8 +265,11 @@ text_row_17 equ  $7d0
 .next       iny
             lda  .addr+2,y
             beq  .done
-            ora  #$80
-            jsr  COUT
+            bpl  .notinv      ; ORA #$80 chars = invert
+            and  #$3f
+            jmp  .cout
+.notinv     ora  #$80
+.cout       jsr  COUT
             jmp  .next
 .done
             endm
@@ -282,8 +285,11 @@ text_row_17 equ  $7d0
 .next       iny
             lda  .addr+2,y
             beq  .done
-            and  #$3f
-            jsr  COUT
+            bpl  .notinv      ; ORA #$80 chars = invert
+            ora  #$80
+            jmp .cout
+.notinv     and  #$3f
+.cout       jsr  COUT
             jmp  .next
 .done
             endm
@@ -1034,33 +1040,35 @@ SEEK_ERR_ADDR equ text_row_0a+9
 DATA_CHECKSUM_ADDR equ text_row_0a+37
 
 M_FIELDS
-            byte $0c,$00 ; ypos, xpos
+            byte $0b,$00 ; ypos, xpos
             byte "ADDR FIELD ERR ___    DATA FIELD ERR ___",0
-ADDR_FIELD_ERR_ADDR_M equ text_row_0c+15
-ADDR_FIELD_ERR_ADDR_K equ text_row_0c+16
-ADDR_FIELD_ERR_ADDR_E equ text_row_0c+17
-DATA_FIELD_ERR_ADDR_M equ text_row_0c+37
-DATA_FIELD_ERR_ADDR_K equ text_row_0c+38
-DATA_FIELD_ERR_ADDR_E equ text_row_0c+39
+ADDR_FIELD_ERR_ADDR_M equ text_row_0b+15
+ADDR_FIELD_ERR_ADDR_K equ text_row_0b+16
+ADDR_FIELD_ERR_ADDR_E equ text_row_0b+17
+DATA_FIELD_ERR_ADDR_M equ text_row_0b+37
+DATA_FIELD_ERR_ADDR_K equ text_row_0b+38
+DATA_FIELD_ERR_ADDR_E equ text_row_0b+39
 
 M_BAD_TRACK
             byte $08, 00 ; ypos, xpos
-            byte "UNEXPECTED TRACK. PRESS [R] TO RE-SEEK.",0
+            byte "NOT ON TARGET TRACK. PRESS ",'R|$80," TO RE-SEEK.",0
 M_BAD_TRACK_OK
             byte $08, 00 ; ypos, xpos
             byte "                                       ",0
 
 M_INSTRUCTIONS
-            byte $0f,$00 ; ypos, xpos
-            byte "SELECT DRIVE [1], [2]   MOTOR O[N] OF[F]"
-            byte "TRACK [0], 3[4] OR [LEFT]/[RGHT] FOR -/+"
-            byte "                              [ESC] EXIT"
+            byte $0d,$00 ; ypos, xpos
             byte "ERROR",13
-            byte "CODES: _EEK  _ISSING  CHEC_SUM  _PILOGUE",0
-ERR_CODE_SEEK_ADDR equ text_row_13+7
-ERR_CODE_MISSING_ADDR equ text_row_13+13
-ERR_CODE_CHECKSUM_ADDR equ text_row_13+26
-ERR_CODE_EPILOGUE_ADDR equ text_row_13+32
+            byte "CODES: _EEK  _ISSING  CHEC_SUM  _PILOGUE",13,13
+            byte 'H|$80,"ELP   "
+            byte "DRIVE ",'1|$80," ",'2|$80
+            byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
+            byte "       MOTOR O",'N|$80," OF",'F|$80
+            byte "   QUIT ",'E|$80,'S|$80,'C|$80,0
+ERR_CODE_SEEK_ADDR equ text_row_0e+7
+ERR_CODE_MISSING_ADDR equ text_row_0e+13
+ERR_CODE_CHECKSUM_ADDR equ text_row_0e+26
+ERR_CODE_EPILOGUE_ADDR equ text_row_0e+32
 
 M_TITLE
             byte $16,$01 ; ypos, xpos
