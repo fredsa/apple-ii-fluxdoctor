@@ -261,13 +261,15 @@ text_row_17 equ  $7d0
             jsr  VTAB
             lda  .addr+1
             sta  CH
+            lda  #>(.addr-256+2) ; reset high byte
+            sta  .noinc+2
             ldy  #$ff
 .next       iny
             bne  .noinc
-            inc  .noinc+2
+            inc  .noinc+2       ; increment high byte
 .noinc      lda  .addr-256+2,y
             beq  .done
-            bpl  .notinv      ; ORA #$80 chars = invert
+            bpl  .notinv        ; ORA #$80 chars = invert
             and  #$3f
             jmp  .cout
 .notinv     ora  #$80
@@ -283,13 +285,15 @@ text_row_17 equ  $7d0
             jsr  VTAB
             lda  .addr+1
             sta  CH
+            lda  #>(.addr-256+2) ; reset high byte
+            sta  .noinc+2
             ldy  #$ff
 .next       iny
             bne  .noinc
-            inc  .noinc+2
+            inc  .noinc+2       ; increment high byte
 .noinc      lda  .addr-256+2,y
             beq  .done
-            bpl  .notinv      ; ORA #$80 chars = invert
+            bpl  .notinv        ; ORA #$80 chars = invert
             ora  #$80
             jmp .cout
 .notinv     and  #$3f
