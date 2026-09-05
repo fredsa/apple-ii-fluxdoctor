@@ -438,10 +438,7 @@ prepmap2    lda  dos33_6and2,y
             ; Boilerplate text
             ; --------------------------------------------------
             jsr  resetscreen
-            printmessage M_INSTRUCTIONS
-            printmessageinv M_TITLE
-            printmessage M_COPYRIGHT
-            printmessage M_GITHUB
+            printmessage M_ERROR_CODES
             lda  #ERR_CODE_SEEK
             sta  ERR_CODE_SEEK_ADDR
             lda  #ERR_CODE_MISSING
@@ -450,6 +447,10 @@ prepmap2    lda  dos33_6and2,y
             sta  ERR_CODE_CHECKSUM_ADDR
             lda  #ERR_CODE_EPILOGUE
             sta  ERR_CODE_EPILOGUE_ADDR
+            printmessage M_KEYBOARD_SHORTCUTS
+            printmessageinv M_TITLE
+            printmessage M_COPYRIGHT
+            printmessage M_GITHUB
 
 
 
@@ -1060,10 +1061,17 @@ M_BAD_TRACK_OK
             byte $08, 00 ; ypos, xpos
             byte "                                       ",0
 
-M_INSTRUCTIONS
+M_ERROR_CODES
             byte $0d,$00 ; ypos, xpos
             byte "ERROR",13
-            byte "CODES: _EEK  _ISSING  CHEC_SUM  _PILOGUE",13,13
+            byte "CODES: _EEK  _ISSING  CHEC_SUM  _PILOGUE",0
+ERR_CODE_SEEK_ADDR equ text_row_0e+7
+ERR_CODE_MISSING_ADDR equ text_row_0e+13
+ERR_CODE_CHECKSUM_ADDR equ text_row_0e+26
+ERR_CODE_EPILOGUE_ADDR equ text_row_0e+32
+
+M_KEYBOARD_SHORTCUTS
+            byte $10,$00 ; ypos, xpos
             byte 'H|$80,"ELP   "
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
