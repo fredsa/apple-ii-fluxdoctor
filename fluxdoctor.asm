@@ -441,21 +441,7 @@ prepmap2    lda  dos33_6and2,y
             ; --------------------------------------------------
             ; Boilerplate text
             ; --------------------------------------------------
-            jsr  resetscreen
-            printmessage M_ERROR_CODES
-            lda  #ERR_CODE_SEEK
-            sta  ERR_CODE_SEEK_ADDR
-            lda  #ERR_CODE_MISSING
-            sta  ERR_CODE_MISSING_ADDR
-            lda  #ERR_CODE_CHECKSUM
-            sta  ERR_CODE_CHECKSUM_ADDR
-            lda  #ERR_CODE_EPILOGUE
-            sta  ERR_CODE_EPILOGUE_ADDR
-            printmessage M_KEYBOARD_SHORTCUTS
-            printmessageinv M_TITLE
-            printmessage M_COPYRIGHT
-            printmessage M_GITHUB
-
+            jsr  fullresetscreen
 
 
             ; --------------------------------------------------
@@ -559,6 +545,11 @@ nozero
             jsr  seek
             jmp  nokey
 nofour
+
+            cmp #'H
+            bne noh
+            jsr help
+noh
 
             cmp #'R
             bne nor
@@ -812,6 +803,42 @@ end_write_protect
 ; --------------------------------------------------
 ; Helpers
 ; --------------------------------------------------
+help
+            jsr HOME
+            printmessage M_HELP1
+            jsr helpanykey
+
+            printmessage M_HELP2
+            jsr helpanykey
+
+            printmessage M_HELP3
+            printmessage M_KEYBOARD_SHORTCUTS
+            jsr helpanykey
+            jsr fullresetscreen
+            rts
+
+helpanykey  printmessage M_HELP_TITLE
+            printmessage M_PRESS_ANY_KEY
+noanykey    lda KBD
+            bpl noanykey
+            sta KBDSTRB
+            jsr HOME
+            rts
+
+fullresetscreen
+            printmessage M_ERROR_CODES
+            lda  #ERR_CODE_SEEK
+            sta  ERR_CODE_SEEK_ADDR
+            lda  #ERR_CODE_MISSING
+            sta  ERR_CODE_MISSING_ADDR
+            lda  #ERR_CODE_CHECKSUM
+            sta  ERR_CODE_CHECKSUM_ADDR
+            lda  #ERR_CODE_EPILOGUE
+            sta  ERR_CODE_EPILOGUE_ADDR
+            printmessage M_KEYBOARD_SHORTCUTS
+            printmessageinv M_TITLE
+            printmessage M_COPYRIGHT
+            printmessage M_GITHUB
 resetscreen
             printmessage M_SLOT_DRIVE
             printmessage M_TARGET_TRACK
@@ -1081,10 +1108,60 @@ M_KEYBOARD_SHORTCUTS
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
             byte "       MOTOR O",'N|$80," OF",'F|$80
             byte "   QUIT ",'E|$80,'S|$80,'C|$80,0
-ERR_CODE_SEEK_ADDR equ text_row_0e+7
-ERR_CODE_MISSING_ADDR equ text_row_0e+13
-ERR_CODE_CHECKSUM_ADDR equ text_row_0e+26
-ERR_CODE_EPILOGUE_ADDR equ text_row_0e+32
+
+M_HELP_TITLE
+            byte $00,$00 ; ypos, xpos
+            byte 'F|$80,'L|$80,'U|$80,'X|$80,'D|$80,'O|$80,'C|$80,'T|$80,'O|$80,'R|$80
+            byte " DIAGNOSIS AND REPAIR UTILITY",0
+
+M_PRESS_ANY_KEY
+            byte $17,$00 ; ypos, xpos
+            byte "PRESS ANY KEY TO CONTINUE",0
+
+M_HELP1
+            byte $02,$00 ; ypos, xpos
+            byte "SCANS DISKS CONTINUOUSLY, DISPLAYS",13
+            byte "SECTORS READ AND MARKS ERRORS NORMALLY",13
+            byte "HIDDEN FROM THE USER.",13
+            byte 13
+            byte "REVEALS SUBTLE MEDIA AND DISK DRIVE",13
+            byte "HARDWARE PROBLEMS.",13
+            byte 13
+            byte "DRIVE IS COMMANDED TO SPIN INDEFINITELY",13
+            byte "TO EASE EXTENDED REPAIR RELATED TASKS.",13
+            byte 13
+            byte "CASSETTE TAPE VERSION ALLOWS REPAIRS",13
+            byte "FOR USERS WITH ONLY A DEFECTIVE DRIVE.",13
+            byte 13
+            byte "AUTOSTART ENABLES DRIVE REPAIR WITHOUT",13
+            byte "A WORKING KEYBOARD.",13
+            byte 13
+            byte "KEYBOARD SHORTCUTS PROVIDE THE USER",13
+            byte "FULL ACCESS TO LOW-LEVEL DRIVE COMMANDS.",0
+
+M_HELP2
+            byte $02,$00 ; ypos, xpos
+            byte "ON A WORKING SYSTEM, A CALIBRATED DRIVE",13
+            byte "WILL RELIABLY READ ALL 16 SECTORS OF A",13
+            byte "FORMATTED TRACK DURING EACH ROTATION",13
+            byte "OF THE DISK. THE SECTOR LIST SHOULD THUS"
+            byte "UPDATE FIVE TIMES PER SECOND (300 RPM).",13
+            byte "",13
+            byte "WHEN THE CHOSEN SECTOR DISPLAY ORDER",13
+            byte "MATCHES THE PHYSICAL TRACK LAYOUT,",13
+            byte "THE SECTOR LIST WILL APPEAR TO STROBE",13
+            byte "SECTOR READS FROM LEFT TO RIGHT.",13
+            byte "",13
+            byte "INTERMITTENT READ ERRORS WILL DISRUPT",13
+            byte "THIS FLOW. USE ANY SEEK FUNCTION TO",13
+            byte "REINITIALZE THE SECTOR VIEW AND RESET",13
+            byte "ALL ERROR CODES.",0
+
+M_HELP3
+            byte $02,$00 ; ypos, xpos
+            byte "AVAIABLE KEYBOARD SHORTCUTS ARE SHOWN",13
+            byte "BELOW AND ON THE MAIN DIAGNOSTIC SCREEN.",0
+            byte 0
 
 M_TITLE
             byte $16,$01 ; ypos, xpos
