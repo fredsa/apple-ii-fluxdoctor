@@ -1196,7 +1196,8 @@ hexchars    byte '0 & $3F, '1 & $3F, '2 & $3F, '3 & $3F
             byte '8 & $3F, '9 & $3F, 'A & $3F, 'B & $3F
             byte 'C & $3F, 'D & $3F, 'E & $3F, 'F & $3F
 
-sects_appledos byte 0,13,11,9,7,5,3,1,14,12,10,8,6,4,2,15
+sects_appledos    byte 0,13,11,9,7,5,3,1,14,12,10,8,6,4,2,15
+;sects_appleprodos byte 0,8,1,9,2,10,3,11,4,12,5,13,6,14,7,15
 
 
 dos33_6and2
