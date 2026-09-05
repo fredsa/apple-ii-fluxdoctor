@@ -263,7 +263,9 @@ text_row_17 equ  $7d0
             sta  CH
             ldy  #$ff
 .next       iny
-            lda  .addr+2,y
+            bne  .noinc
+            inc  .noinc+2
+.noinc      lda  .addr-256+2,y
             beq  .done
             bpl  .notinv      ; ORA #$80 chars = invert
             and  #$3f
@@ -283,7 +285,9 @@ text_row_17 equ  $7d0
             sta  CH
             ldy  #$ff
 .next       iny
-            lda  .addr+2,y
+            bne  .noinc
+            inc  .noinc+2
+.noinc      lda  .addr-256+2,y
             beq  .done
             bpl  .notinv      ; ORA #$80 chars = invert
             ora  #$80
