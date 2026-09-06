@@ -825,6 +825,9 @@ help
             printmessage M_KEYBOARD_SHORTCUTS
             jsr helpanykey
 
+            printmessage M_HELP7
+            jsr helpanykey
+
             jsr fullresetscreen
             rts
 
@@ -1130,7 +1133,7 @@ M_HELP_TITLE
             byte " DIAGNOSIS AND REPAIR UTILITY",0
 
 M_PRESS_ANY_KEY
-            byte $17,$00 ; ypos, xpos
+            byte $17,$07 ; ypos, xpos
             byte "PRESS ANY KEY TO CONTINUE",0
 
 M_HELP1
@@ -1229,6 +1232,13 @@ M_HELP6
             byte "AVAIABLE KEYBOARD SHORTCUTS ARE ALSO",13
             byte "SHOWN ON THE MAIN DIAGNOSTIC SCREEN.",0
             byte 0
+
+M_HELP7
+            byte $0c,$00 ; ypos, xpos
+            byte "DON'T DELAY. DOWNLOAD THE LATEST VERSION"
+            byte "OF FLUXDOCTOR TODAY!",13
+            byte 13
+            byte "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR",0
 
 M_TITLE
             byte $16,$01 ; ypos, xpos
