@@ -304,12 +304,12 @@ text_row_17 equ  $7d0
 
             mac  readbyte
 .readbyte   lda  Q6L,x        ; read byte
-            bpl  .readbyte
+            bpl  .readbyte    ; must not cross page boundary
             endm
 
             mac  readbyte_y
 .readbyte   ldy  Q6L,x        ; read byte
-            bpl  .readbyte
+            bpl  .readbyte    ; must not cross page boundary
             endm
 
             mac  renderhex
@@ -626,6 +626,7 @@ nokey
             ; Find address field:
             ;   D5 AA 96 {2:VOL} {2:TRACK} {2:SECT} {2:CHKSUM} DE AA EB
             ; --------------------------------------------------
+            align 256
 dofreewheelscan
             ldx  DISK_SLOT    ; restore X
 
