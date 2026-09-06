@@ -196,6 +196,7 @@ EPILOGUE_1  equ  $AA
 ; --------------------------------------------------
 KBD_LEFT    equ  $08
 KBD_RIGHT   equ  $15
+KBD_RESEEK  equ  'R
 
 ; --------------------------------------------------
 ; Codes
@@ -551,7 +552,7 @@ nofour
             jsr help
 noh
 
-            cmp #'R
+            cmp #KBD_RESEEK
             bne nor
             jsr fixtrack
 nor
@@ -1101,7 +1102,7 @@ DATA_FIELD_ERR_ADDR_E equ text_row_0b+39
 
 M_BAD_TRACK
             byte $08, 00 ; ypos, xpos
-            byte "NOT ON TARGET TRACK. PRESS ",'R|$80," TO RE-SEEK.",0
+            byte "NOT ON TARGET TRACK. PRESS ",KBD_RESEEK|$80," TO RE-SEEK.",0
 M_BAD_TRACK_OK
             byte $08, 00 ; ypos, xpos
             byte "                                       ",0
@@ -1168,9 +1169,12 @@ M_HELP2
             byte "LAYOUT DIFFERS FROM DOS.",13
             byte 13
             byte "INTERMITTENT READ ERRORS WILL DISRUPT",13
-            byte "THE PATTERN. USE ANY SEEK FUNCTION TO",13
+            byte "THE PATTERN. USE ANY SEEK OPERATION TO",13
             byte "REINITIALZE THE SECTOR VIEW AND RESET",13
-            byte "ALL ERROR CODES.",0
+            byte "ALL ERROR CODES.",13
+            byte 13
+            byte "THE WRITE PROTECT STATUS IS UPDATED WITH"
+            byte "EVERY SEEK OPERTION. PRESS ",KBD_RESEEK|$80," TO RE-READ.",0
 
 M_HELP3
             byte $02,$00 ; ypos, xpos
@@ -1192,7 +1196,8 @@ M_HELP3
             byte "PRODUCE HIGHER ERROR RATES.",13
             byte 13
             byte "A NEODYMIUM MAGNET MOVED BACK AND FORTH",13
-            byte "OVER A SLEEVED DISK QUICKLY ERASES IT.",0
+            byte "OVER A SLEEVED DISK QUICKLY ERASES IT",13
+            byte "FOR RE-FORMATTING. LIKE NEW (OLD STOCK).",0
 
 M_HELP4
             byte $02,$00 ; ypos, xpos
