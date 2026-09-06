@@ -153,8 +153,8 @@ xxd -p -c 8 out/fluxdoctor-basic.bin \
 echo
 echo "====================================================================="
 echo "To write image to a physical floppy using greaseweazle:"
-echo "  gw write --tracks=step=2 out/fluxdoctor.do    # 96TPI floppy drive"
-echo "  gw write out/fluxdoctor.do                    # 48TPI floppy drive"
+echo "  gw write out/fluxdoctor.do --tracks=step=2    # 96 TPI floppy drive"
+echo "  gw write out/fluxdoctor.do                    # 48 TPI floppy drive"
 
 os_name="$(uname -s)"
 case $os_name in
