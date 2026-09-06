@@ -846,6 +846,9 @@ help
             printmessage M_HELP7
             jsr helpanykey
 
+            printmessage M_HELP8
+            jsr helpanykey
+
             jsr fullresetscreen
             rts
 
@@ -1263,7 +1266,7 @@ M_HELP6
 M_HELP7
             byte $00,$0b ; ypos, xpos
             byte "SOFTWARE UPDATES",13
-            byte 13,13,13,13
+            byte 13
             byte "AUTOSTART DISKETTE IMAGES AND AUDIO TAPE"
             byte "DIAGNOSTIC AND REPAIR SOFTWARE MAY BE",13
             byte "DOWNLOADED AT NO COST TO THE USER FROM:",13
@@ -1273,6 +1276,26 @@ M_HELP7
             byte 13
             byte "DON'T DELAY, DOWNLOAD THE LATEST VERSION"
             byte "OF FLUXDOCTOR TODAY!",0
+
+M_HELP8
+            byte $00,$0b ; ypos, xpos
+            byte "CUSTOMER CORRESPONDENCE",13
+            byte 13
+            byte "THE AUTHOR OF THIS PROGRAM REQUESTS YOUR"
+            byte "FEEDBACK. INQUIRIES MAY BE DIRECTED TO",13
+            byte "FREDSA@GMAIL.COM OR POSTED TO THE PUBLIC"
+            byte "ISSUE TRACKER AT:",13
+            byte 13
+            byte GITHUB_URL,13
+            byte 13
+            byte 13
+            byte "HEARING DIRECTLY FROM USERS LIKE YOU",13
+            byte "SERVES AS ENCOURAGEMENT AND PROVIDES",13
+            byte "MOTIVATION FOR FUTURE WORK.",13
+            byte 13
+            byte "THE AUTHOR LOOKS FORWARD TO READING",13
+            byte "YOUR COMMENTS AND WATCHING YOUR LIVE",13
+            byte "TELEVISION BROADCASTS.",0
 
 M_TITLE
             byte $16,$01 ; ypos, xpos
