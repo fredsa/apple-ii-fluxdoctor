@@ -836,7 +836,7 @@ help
             jsr fullresetscreen
             rts
 
-helpanykey  printmessage M_HELP_TITLE
+helpanykey  printmessage M_HELP_FLUXDOCTOR
             printmessageinv M_PRESS_ANY_KEY
 noanykey    lda KBD
             bpl noanykey
@@ -1130,19 +1130,20 @@ M_KEYBOARD_SHORTCUTS
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
             byte "       MOTOR O",'N|$80," OF",'F|$80
-            byte "   QUIT ",'E|$80,'S|$80,'C|$80,0
+            byte "   ",KBD_RESEEK|$80,"ESEEK    QUIT ",'E|$80,'S|$80,'C|$80,0
 
-M_HELP_TITLE
+M_HELP_FLUXDOCTOR
             byte $00,$00 ; ypos, xpos
-            byte 'F|$80,'L|$80,'U|$80,'X|$80,'D|$80,'O|$80,'C|$80,'T|$80,'O|$80,'R|$80
-            byte " DIAGNOSIS AND REPAIR UTILITY",0
+            byte 'F|$80,'L|$80,'U|$80,'X|$80,'D|$80,'O|$80,'C|$80,'T|$80,'O|$80,'R|$80,0
 
 M_PRESS_ANY_KEY
             byte $17,$07 ; ypos, xpos
             byte "PRESS ANY KEY TO CONTINUE",0
 
 M_HELP1
-            byte $02,$00 ; ypos, xpos
+            byte $00,$0b ; ypos, xpos
+            byte "DIAGNOSIS AND REPAIR UTILITY",13
+            byte 13
             byte "ISOLATES INTERMITTENT ELECTROMECHANICAL",13
             byte "FAULTS. IDENTIFIES LOW QUALITY DISKS.",13
             byte 13
@@ -1162,7 +1163,9 @@ M_HELP1
             byte "DISKETTE BOOTSTRAP IS INOPERATIVE.",0
 
 M_HELP2
-            byte $02,$00 ; ypos, xpos
+            byte $00,$0b ; ypos, xpos
+            byte "SECTOR DISPLAY AND STATUS",13
+            byte 13
             byte "IN A PROPERLY ALIGNED DRIVE, ALL 16",13
             byte "SECTORS OF A TRACK ARE READ DURING EACH",13
             byte "ROTATION. AT 300 RPM (200 MS/REV), THE",13
@@ -1183,7 +1186,9 @@ M_HELP2
             byte "SEEK STEP. PRESS ",KBD_RESEEK|$80," TO RESAMPLE STATUS.",0
 
 M_HELP3
-            byte $02,$00 ; ypos, xpos
+            byte $00,$0b ; ypos, xpos
+            byte "DIAGNOSTIC TOOLS",13
+            byte 13
             byte "THE EXPERIENCED REPAIR TECHNICIAN USES",13
             byte "FACTORY-RECORDED ALIGNMENT DISKETTES.",13
             byte "THE TECHNICIAN MAY ALSO EMPLOY DISKETTES"
@@ -1203,7 +1208,9 @@ M_HELP3
             byte "MAGNETIC FLUX PRIOR TO REFORMATTING.",0
 
 M_HELP4
-            byte $02,$00 ; ypos, xpos
+            byte $00,$0b ; ypos, xpos
+            byte "EMI CONSIDERATIONS",13
+            byte 13
             byte "ELECTROMAGNETIC INTERFERENCE (EMI) FROM",13
             byte "THE HORIZONTAL FLYBACK TRANSFORMER OF A",13
             byte "CRT DISPLAY OR TELEVISION RECEIVER WILL",13
@@ -1225,23 +1232,29 @@ M_HELP4
             byte "BETWEEN DISK II AND THE CRT FLYBACK.",0
 
 M_HELP5
-            byte $08,$00 ; ypos, xpos
+            byte $00,$0b ; ypos, xpos
+            byte "ERROR FLAGS",13
+            byte 13,13,13,13,13,13,13
             byte "DIAGNOSTIC ERROR FLAGS ARE DEFINED BELOW"
             byte "AND DISPLAYED ON THE PRIMARY SCREEN:",0
 
 M_HELP6
-            byte $0c,$00 ; ypos, xpos
+            byte $00,$0b ; ypos, xpos
+            byte "COMMAND KEYS",13
+            byte 13,13,13,13,13,13,13,13,13
             byte "OPERATOR COMMAND KEYS ARE ALSO DISPLAYED"
             byte "ON THE PRIMARY SCREEN FOR CONVENIENCE:",0
 
 M_HELP7
-            byte $07,$00 ; ypos, xpos
+            byte $00,$0b ; ypos, xpos
+            byte "SOFTWARE UPDATES",13
+            byte 13,13,13,13,13
             byte "DON'T DELAY, DOWNLOAD THE LATEST VERSION"
             byte "OF FLUXDOCTOR TODAY!",13
             byte 13
             byte "DISKETTE IMAGE AND AUDIO FILE VERSIONS",13
             byte "ARE AVAILABLE FOR IMMEDIATE DOWNLOAD AT",13
-            byte "NO COST.",13
+            byte "NO COST FROM:",13
             byte 13
             byte GITHUB_URL,0
 
