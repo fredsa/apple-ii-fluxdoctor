@@ -812,20 +812,31 @@ help
             jsr helpanykey
 
             printmessage M_HELP3
+            jsr helpanykey
+
+            printmessage M_HELP4
+            jsr helpanykey
+
+            printmessage M_HELP5
+            jsr errorcodereference
+            jsr helpanykey
+
+            printmessage M_HELP6
             printmessage M_KEYBOARD_SHORTCUTS
             jsr helpanykey
+
             jsr fullresetscreen
             rts
 
 helpanykey  printmessage M_HELP_TITLE
-            printmessage M_PRESS_ANY_KEY
+            printmessageinv M_PRESS_ANY_KEY
 noanykey    lda KBD
             bpl noanykey
             sta KBDSTRB
             jsr HOME
             rts
 
-fullresetscreen
+errorcodereference
             printmessage M_ERROR_CODES
             lda  #ERR_CODE_SEEK
             sta  ERR_CODE_SEEK_ADDR
@@ -835,6 +846,10 @@ fullresetscreen
             sta  ERR_CODE_CHECKSUM_ADDR
             lda  #ERR_CODE_EPILOGUE
             sta  ERR_CODE_EPILOGUE_ADDR
+            rts
+
+fullresetscreen
+            jsr errorcodereference
             printmessage M_KEYBOARD_SHORTCUTS
             printmessageinv M_TITLE
             printmessage M_COPYRIGHT
@@ -1102,7 +1117,7 @@ ERR_CODE_CHECKSUM_ADDR equ text_row_0e+26
 ERR_CODE_EPILOGUE_ADDR equ text_row_0e+32
 
 M_KEYBOARD_SHORTCUTS
-            byte $10,$00 ; ypos, xpos
+            byte $11,$00 ; ypos, xpos
             byte 'H|$80,"ELP   "
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
@@ -1120,12 +1135,11 @@ M_PRESS_ANY_KEY
 
 M_HELP1
             byte $02,$00 ; ypos, xpos
-            byte "DRIVE IS COMMANDED TO SPIN INDEFINITELY",13
-            byte "TO EASE EXTENDED REPAIR RELATED TASKS.",13
+            byte "SCANS DISKS CONTINUOUSLY TO EASE",13
+            byte "DIAGNOSIS AND REPAIR RELATED TASKS.",13
             byte 13
-            byte "SCANS DISKS CONTINUOUSLY, DISPLAYING",13
-            byte "SECTORS READ WHILE MARKING ERRORS",13
-            byte "NORMALLY HIDDEN FROM THE USER.",13
+            byte "REAL-TIME FEEDBACK, SHOWS SECTORS READ",13
+            byte "AND ERRORS NORMALLY HIDDEN BY DOS.",13
             byte 13
             byte "REVEALS SUBTLE MEDIA AND DISK DRIVE",13
             byte "HARDWARE PROBLEMS.",13
@@ -1161,8 +1175,55 @@ M_HELP2
 
 M_HELP3
             byte $02,$00 ; ypos, xpos
-            byte "AVAIABLE KEYBOARD SHORTCUTS ARE SHOWN",13
-            byte "BELOW AND ON THE MAIN DIAGNOSTIC SCREEN.",0
+            byte "THE EXPERIENCED REPAIR TECHNICIAN USES",13
+            byte "FACTORY WRITTEN DISKS WHENEVER POSSIBLE."
+            byte 13
+            byte "THE PRACTICAL TECHNICIAN MAY ALSO USE",13
+            byte "DISKS THAT WERE FORMATTED BY A KNOWN",13
+            byte "GOOD DISK II OR OTHER 48 TPI DRIVE.",13
+            byte 13
+            byte "CAUTION: DISKS WRITTEN BY A 96 TPI DRIVE"
+            byte "PRODUCE WEAK SIGNALS WHEN READ BACK IN",13
+            byte "48 TPI DRIVES. EXPECT TO SEE INTERMITENT"
+            byte "ERRORS THAT ARE NORMALLY HIDDEN FROM THE"
+            byte "USER BY THE O/S IN A WORKING SYSTEM.",13
+            byte 13
+            byte "DISKS WRITTEN FIRST BY A 48 TPI DRIVE,",13
+            byte "THEN OVERWRITTEN IN A 96 TPI DRIVE, WILL"
+            byte "PRODUCE HIGHER ERROR RATES.",13
+            byte 13
+            byte "A NEODYMIUM MAGNET MOVED BACK AND FORTH",13
+            byte "OVER A SLEEVED DISK QUICKLY ERASES IT.",0
+
+M_HELP4
+            byte $02,$00 ; ypos, xpos
+            byte "THE FLYBACK TRANSFORMER IN A CATHODE RAY"
+            byte "TUBE (CRT) TELEVISION SET OR COMPUTER",13
+            byte "MONITOR GENERATES INTERFERENCE THAT",13
+            byte "WILL AFFECT ANY DISK II DRIVE THAT IS",13
+            byte "PLACED UNDERNEATH OR NEXT TO THE CRT.",13
+            byte "",13
+            byte "THE INTERFERENCE IS GREATEST NEAR THE",13
+            byte "FLYBACK, WHICH IS COMMONLY LOCATED IN",13
+            byte "THE LEFT REAR CORNER OF THE MONITOR.",13
+            byte "",13
+            byte "DISKS WRITTEN BY 96 TPI DRIVES MAY BE",13
+            byte "ESPECIALLY DIFFICULT TO READ IN THE",13
+            byte "PRESENCE OF FLYBACK INTERFERENCE.",13
+            byte "",13
+            byte "PREFER DISKS WRITTEN BY 48 TPI DRIVES",13
+            byte "WHEN UTILIZING A CRT.",0
+
+M_HELP5
+            byte $09,$00 ; ypos, xpos
+            byte "ERROR CODES ARE DOCUMENTED ON THE MAIN",13
+            byte "SCREEN FOR EASY REFERENCE.",0
+            byte 0
+
+M_HELP6
+            byte $0c,$00 ; ypos, xpos
+            byte "AVAIABLE KEYBOARD SHORTCUTS ARE ALSO",13
+            byte "SHOWN ON THE MAIN DIAGNOSTIC SCREEN.",0
             byte 0
 
 M_TITLE
