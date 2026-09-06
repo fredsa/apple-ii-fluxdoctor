@@ -36,6 +36,36 @@ case $os_name in
     ;;
 esac
 
+disk="true";tape="true";monitor="true"
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -h|--help)
+      echo "Usage:"
+      echo "  $0                # Tape and disk"
+      echo "  $0 -t|--tape      # Tape only"
+      echo "  $0 -d|--disk      # Disk only"
+      echo "  $0 -m|--monitor   # Monitor type-in"
+      exit
+      ;;
+    -d|--disk)
+      disk="true";tape="false";monitor="false"
+      shift 1
+      ;;
+    -t|--tape)
+      disk="false";tape="true";monitor="false"
+      shift 1
+      ;;
+    -m|--monitor)
+      disk="false";tape="false";monitor="true"
+      shift 1
+      ;;
+    *)
+      echo "UNRECOGNIZED ARGUMENT: $1" 1>&2
+      exit 1
+      ;;
+    esac
+done
+
 if ! type -p dasm >/dev/null 2>&1; then
     echo "ERROR, missing executable:" 1>&2
     echo "  dasm" 1>&2
@@ -109,70 +139,78 @@ echo "Creating out/fluxdoctor-basic.bin"
 printf '\x0B\x08\x2A\x00\x8C\x32\x30\x36\x31\x00\x00\x00' > out/fluxdoctor-basic.bin
 cat out/fluxdoctor.bin >> out/fluxdoctor-basic.bin
 
-echo
-echo "====================================================================="
-echo "Creating blank disk image:"
-echo "  template/hello.do -> out/fluxdoctor.do"
-# $AC -dos140 out/fluxdoctor.do
-cp template/hello.do out/fluxdoctor.do
-# ls -l out/fluxdoctor.do
-echo "Removing pre-existing FLUXDOCTOR from template disk image:"
-echo "  out/fluxdoctor.do : delete FLUXDOCTOR"
-$AC -d out/fluxdoctor.do FLUXDOCTOR
+if [ "$disk" == "true" ]; then
+  echo
+  echo "====================================================================="
+  echo "Creating blank disk image:"
+  echo "  template/hello.do -> out/fluxdoctor.do"
+  # $AC -dos140 out/fluxdoctor.do
+  cp template/hello.do out/fluxdoctor.do
+  # ls -l out/fluxdoctor.do
+  echo "Removing pre-existing FLUXDOCTOR from template disk image:"
+  echo "  out/fluxdoctor.do : delete FLUXDOCTOR"
+  $AC -d out/fluxdoctor.do FLUXDOCTOR
 
-# https://applecommander.github.io/cli/ac/#putting-files-and-file-types
-# https://en.wikipedia.org/wiki/Apple_DOS#Technical_details
-echo
-echo "====================================================================="
-echo "Adding FLUXDOCTOR program to disk image:"
-echo "  out/fluxdoctor-basic.bin -> FLUXDOCTOR"
-$AC -p out/fluxdoctor.do FLUXDOCTOR A < out/fluxdoctor-basic.bin
+  # https://applecommander.github.io/cli/ac/#putting-files-and-file-types
+  # https://en.wikipedia.org/wiki/Apple_DOS#Technical_details
+  echo
+  echo "====================================================================="
+  echo "Adding FLUXDOCTOR program to disk image:"
+  echo "  out/fluxdoctor-basic.bin -> FLUXDOCTOR"
+  $AC -p out/fluxdoctor.do FLUXDOCTOR A < out/fluxdoctor-basic.bin
 
-echo
-echo "====================================================================="
-echo "Final disk image is ready:"
-echo "  out/fluxdoctor.do"
-$AC -ll out/fluxdoctor.do
+  echo
+  echo "====================================================================="
+  echo "Final disk image is ready:"
+  echo "  out/fluxdoctor.do"
+  $AC -ll out/fluxdoctor.do
 
-echo
-echo "====================================================================="
-echo "Creating cassette bootable WAV file:"
-echo "  out/fluxdoctor-basic.bin -> out/fluxdoctor-basic.wav"
-fluxrider out/fluxdoctor-basic.bin out/fluxdoctor-basic.wav
+  echo
+  echo "====================================================================="
+  echo "To write image to a physical floppy using greaseweazle:"
+  echo "  gw write out/fluxdoctor.do --tracks=step=2    # 96 TPI floppy drive"
+  echo "  gw write out/fluxdoctor.do                    # 48 TPI floppy drive"
+fi
 
-echo
-echo "Creating monitor type-in version of tape program:"
-echo "====================================================================="
-echo "  out/fluxdoctor-basic.bin -> out/fluxdoctor-basic.mon"
-# BASIC start address
-echo -n "0801" > out/fluxdoctor-basic.mon
-xxd -p -c 8 out/fluxdoctor-basic.bin \
-  | awk '{gsub(/(..)/, "& "); print ":" toupper($0)}' \
-  >> out/fluxdoctor-basic.mon
+if [ "$tape" == "true" ]; then
+  echo
+  echo "====================================================================="
+  echo "Creating cassette bootable WAV file:"
+  echo "  out/fluxdoctor-basic.bin -> out/fluxdoctor-basic.wav"
+  fluxrider out/fluxdoctor-basic.bin out/fluxdoctor-basic.wav
+fi
 
-echo
-echo "====================================================================="
-echo "To write image to a physical floppy using greaseweazle:"
-echo "  gw write out/fluxdoctor.do --tracks=step=2    # 96 TPI floppy drive"
-echo "  gw write out/fluxdoctor.do                    # 48 TPI floppy drive"
+if [ "$monitor" == "true" ]; then
+  echo
+  echo "Creating monitor type-in version of tape program:"
+  echo "====================================================================="
+  echo "  out/fluxdoctor-basic.bin -> out/fluxdoctor-basic.mon"
+  # BASIC start address
+  echo -n "0801" > out/fluxdoctor-basic.mon
+  xxd -p -c 8 out/fluxdoctor-basic.bin \
+    | awk '{gsub(/(..)/, "& "); print ":" toupper($0)}' \
+    >> out/fluxdoctor-basic.mon
+fi
 
-os_name="$(uname -s)"
-case $os_name in
-  Darwin)
-    # macOS
-    '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' out/fluxdoctor.do
-    # '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' out/fluxdoctor-basic.wav
-    ;;
-  Linux)
-    # Linux
-    echo "TODO: launch emulator with disk image: out/fluxdoctor.do"
-    ;;
-  MINGW64*)
-    # Windows Git Bash
-    echo "Launching AppleWin emulator"
-    AppleWin -d1 out/fluxdoctor.do
-    ;;
-  *)
-    echo "ERROR: Unknown OS name for `$os_name`" 1>&2
-    ;;
-esac
+if [ "$disk" == "true" ]; then
+  os_name="$(uname -s)"
+  case $os_name in
+    Darwin)
+      # macOS
+      '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' out/fluxdoctor.do
+      # '/Applications/Virtual ][.app/Contents/MacOS/Virtual ][' out/fluxdoctor-basic.wav
+      ;;
+    Linux)
+      # Linux
+      echo "TODO: launch emulator with disk image: out/fluxdoctor.do"
+      ;;
+    MINGW64*)
+      # Windows Git Bash
+      echo "Launching AppleWin emulator"
+      AppleWin -d1 out/fluxdoctor.do
+      ;;
+    *)
+      echo "ERROR: Unknown OS name for `$os_name`" 1>&2
+      ;;
+  esac
+fi
