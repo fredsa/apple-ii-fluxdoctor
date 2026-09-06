@@ -752,6 +752,8 @@ nofour
 
             cmp #'H
             bne noh
+            ldx  DISK_SLOT    ; restore X
+            lda  MOTOROFF,x   ; motor off
             jsr help
 noh
 
