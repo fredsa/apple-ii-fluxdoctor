@@ -630,13 +630,11 @@ nokey
 dofreewheelscan
             ldx  DISK_SLOT    ; restore X
 
-
-            ; ldy  $fc
-            ldy  $00
+            ldy  #$4
             sty  TEMP1
 readbyte0   iny
             bne  readbyte1
-            inc  TEMP1
+            dec  TEMP1
             beq  noheadererr
 readbyte1   readbyte
 chkbyte0    cmp  #PROLOGUE_0
