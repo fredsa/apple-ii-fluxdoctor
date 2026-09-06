@@ -496,146 +496,30 @@ noexit
             sta  SPINNER_ADDR
 
             ; --------------------------------------------------
-            ; Handle key press
+            ; Handle input
             ; --------------------------------------------------
-            lda  KBD
-            bmi  checkkeys
-            jmp  nokey
-checkkeys   sta  KBDSTRB
-            and  #$7f
-            cmp  #'a
-            bcc  nokeycase
-            cmp  #'z+1
-            bcs  nokeycase
-            eor  #$20
-nokeycase
-
-            cmp  #KBD_LEFT
-            bne  noleft
-            lda  DISK_TRACK
-            cmp  #0           ; lowest track
-            beq  noleft
-            dec  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-noleft
-
-            cmp  #KBD_RIGHT
-            bne  noright
-            lda  DISK_TRACK
-            cmp  #34          ; highest track
-            beq  noright
-            inc  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-noright
-
-            cmp  #'0
-            bne  nozero
-            lda  DISK_TRACK
-            cmp  #0
-            beq  nozero
-            lda  #0
-            sta  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-nozero
-
-            cmp  #'4
-            bne  nofour
-            lda  DISK_TRACK
-            cmp  #34
-            beq  nofour
-            lda  #34
-            sta  DISK_TRACK
-            jsr  seek
-            jmp  nokey
-nofour
-
-            cmp #'H
-            bne noh
-            jsr help
-noh
-
-            cmp #KBD_RESEEK
-            bne nor
-            jsr fixtrack
-nor
-
-            cmp  #$1B         ; ESC
-            bne  noesc
-            lda  #$FF
-            sta  EXIT_FLAG
-noesc
-            cmp  #'N
-            bne  nomotoron
-            ldx  DISK_SLOT    ; restore X
-            lda  MOTORON,x    ; motor on
-            lda  #CODE_Y
-            sta  RUNNING
-nomotoron
-
-            cmp  #'F
-            bne  nomotoroff
-            ldx  DISK_SLOT    ; restore X
-            lda  MOTOROFF,x   ; motor off
-            lda  #CODE_N
-            sta  RUNNING
-nomotoroff
-
-            cmp  #'1
-            bne  nodrive1
-            ldx  DISK_SLOT    ; restore X
-            lda  MOTOROFF,x   ; motor off
-            lda  #CODE_N
-            sta  RUNNING
-            lda  #$01
-            sta  DISK_DRIVE
-            jsr  setdisktrack
-            jsr  resetscreen
-            ldx  DISK_SLOT    ; restore X
-            lda  DRV0EN,x
-            lda  MOTORON,x    ; motor on
-            lda  #CODE_Y
-            sta  RUNNING
-nodrive1
-
-            cmp  #'2
-            bne  nodrive2
-            ldx  DISK_SLOT    ; restore X
-            lda  MOTOROFF,x   ; motor off
-            lda  #CODE_N
-            sta  RUNNING
-            lda  #$02
-            sta  DISK_DRIVE
-            jsr  setdisktrack
-            jsr  resetscreen
-            ldx  DISK_SLOT    ; restore X
-            lda  DRV1EN,x
-            lda  MOTORON,x    ; motor on
-            lda  #CODE_Y
-            sta  RUNNING
-nodrive2
-
-nokey
+            jsr checkkeys
 
             ; --------------------------------------------------
             ; Is the motor running?
             ; --------------------------------------------------
             lda  RUNNING
             cmp  #CODE_Y
-            beq  dofreewheelscan
-            jmp  freewheelloop ; avoid infinite readbyte loop
+            bne  freewheelloop ; avoid infinite readbyte loop
+            jmp  dofreewheelscan
 
 
             ; --------------------------------------------------
-            ; Find address field:
-            ;   D5 AA 96 {2:VOL} {2:TRACK} {2:SECT} {2:CHKSUM} DE AA EB
+            ; Free wheel'n drive scan
             ; --------------------------------------------------
             align 256
 dofreewheelscan
             ldx  DISK_SLOT    ; restore X
 
+            ; --------------------------------------------------
+            ; Find address field:
+            ;   D5 AA 96 {2:VOL} {2:TRACK} {2:SECT} {2:CHKSUM} DE AA EB
+            ; --------------------------------------------------
             ldy  #$4
             sty  TEMP1
 readbyte0   iny
@@ -805,6 +689,132 @@ end_write_protect
             sta  WRITE_PROTECT_ADDR
             rts
 
+
+; --------------------------------------------------
+; Handle key press
+; --------------------------------------------------
+checkkeys   lda  KBD
+            bmi  keystrobe
+            jmp  nokey
+keystrobe   sta  KBDSTRB
+            and  #$7f
+            cmp  #'a
+            bcc  nokeycase
+            cmp  #'z+1
+            bcs  nokeycase
+            eor  #$20
+nokeycase
+
+            cmp  #KBD_LEFT
+            bne  noleft
+            lda  DISK_TRACK
+            cmp  #0           ; lowest track
+            beq  noleft
+            dec  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+noleft
+
+            cmp  #KBD_RIGHT
+            bne  noright
+            lda  DISK_TRACK
+            cmp  #34          ; highest track
+            beq  noright
+            inc  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+noright
+
+            cmp  #'0
+            bne  nozero
+            lda  DISK_TRACK
+            cmp  #0
+            beq  nozero
+            lda  #0
+            sta  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+nozero
+
+            cmp  #'4
+            bne  nofour
+            lda  DISK_TRACK
+            cmp  #34
+            beq  nofour
+            lda  #34
+            sta  DISK_TRACK
+            jsr  seek
+            jmp  nokey
+nofour
+
+            cmp #'H
+            bne noh
+            jsr help
+noh
+
+            cmp #KBD_RESEEK
+            bne nor
+            jsr fixtrack
+nor
+
+            cmp  #$1B         ; ESC
+            bne  noesc
+            lda  #$FF
+            sta  EXIT_FLAG
+noesc
+            cmp  #'N
+            bne  nomotoron
+            ldx  DISK_SLOT    ; restore X
+            lda  MOTORON,x    ; motor on
+            lda  #CODE_Y
+            sta  RUNNING
+nomotoron
+
+            cmp  #'F
+            bne  nomotoroff
+            ldx  DISK_SLOT    ; restore X
+            lda  MOTOROFF,x   ; motor off
+            lda  #CODE_N
+            sta  RUNNING
+nomotoroff
+
+            cmp  #'1
+            bne  nodrive1
+            ldx  DISK_SLOT    ; restore X
+            lda  MOTOROFF,x   ; motor off
+            lda  #CODE_N
+            sta  RUNNING
+            lda  #$01
+            sta  DISK_DRIVE
+            jsr  setdisktrack
+            jsr  resetscreen
+            ldx  DISK_SLOT    ; restore X
+            lda  DRV0EN,x
+            lda  MOTORON,x    ; motor on
+            lda  #CODE_Y
+            sta  RUNNING
+nodrive1
+
+            cmp  #'2
+            bne  nodrive2
+            ldx  DISK_SLOT    ; restore X
+            lda  MOTOROFF,x   ; motor off
+            lda  #CODE_N
+            sta  RUNNING
+            lda  #$02
+            sta  DISK_DRIVE
+            jsr  setdisktrack
+            jsr  resetscreen
+            ldx  DISK_SLOT    ; restore X
+            lda  DRV1EN,x
+            lda  MOTORON,x    ; motor on
+            lda  #CODE_Y
+            sta  RUNNING
+nodrive2
+
+nokey       rts
+
+
 ; --------------------------------------------------
 ; Helpers
 ; --------------------------------------------------
@@ -972,7 +982,7 @@ renderdatachecksumbad
 ; --------------------------------------------------
 seek
             jsr  resetscreen
-            printmessage M_BAD_TRACK_OK
+            printmessage M_MESSAGE_OK
 
             lda DISK_DRIVE   ; get desired track
             ror
@@ -1019,13 +1029,13 @@ maybefixtrack
             beq  nofixtrack ; beep only once
             lda  #ERR_CODE_SEEK
             sta  SEEK_ERR_ADDR
-            printmessageinv M_BAD_TRACK
+            printmessageinv M_MESSAGE_BAD_TRACK
             jsr  BELLB
 nofixtrack  rts
 
 
 fixtrack
-            printmessage M_BAD_TRACK_OK
+            printmessage M_MESSAGE_OK
             lda  DISK_SLOT
             lsr
             lsr
@@ -1108,12 +1118,14 @@ DATA_FIELD_ERR_ADDR_M equ text_row_0b+37
 DATA_FIELD_ERR_ADDR_K equ text_row_0b+38
 DATA_FIELD_ERR_ADDR_E equ text_row_0b+39
 
-M_BAD_TRACK
-            byte $08, 00 ; ypos, xpos
+MESSAGE_YPOS equ $08
+
+M_MESSAGE_BAD_TRACK
+            byte MESSAGE_YPOS, 00 ; ypos, xpos
             byte "NOT ON TARGET TRACK. PRESS ",KBD_RESEEK|$80," TO RE-SEEK.",0
-M_BAD_TRACK_OK
-            byte $08, 00 ; ypos, xpos
-            byte "                                       ",0
+M_MESSAGE_OK
+            byte MESSAGE_YPOS, 00 ; ypos, xpos
+            byte "                                        ",0
 
 M_ERROR_CODES
             byte $0d,$00 ; ypos, xpos
@@ -1225,7 +1237,7 @@ M_HELP4
             byte "NARROW-TRACK (96 TPI) RECORDED MEDIA",13
             byte "PRODUCES VERY LOW AMPLITUDE SIGNALS WHEN"
             byte "READ BY WIDE-TRACK (48 TPI) HEADS.",13
-            byte "UNACCEPTABLE ERROR RATES MAY BE SEEN IN",13
+            byte "UNACCEPTABLE ERROR RATES WILL BE SEEN IN"
             byte "THE PRESENCE OF FLYBACK INTERFERENCE.",13
             byte 13
             byte "MAINTAIN AT LEAST 12 INCHES SEPARATION",13
@@ -1248,15 +1260,16 @@ M_HELP6
 M_HELP7
             byte $00,$0b ; ypos, xpos
             byte "SOFTWARE UPDATES",13
-            byte 13,13,13,13,13
+            byte 13,13,13,13
+            byte "AUTOSTART DISKETTE IMAGES AND AUDIO TAPE"
+            byte "DIAGNOSTIC AND REPAIR SOFTWARE MAY BE",13
+            byte "DOWNLOADED AT NO COST TO THE USER FROM:",13
+            byte 13
+            byte GITHUB_URL,13
+            byte 13
+            byte 13
             byte "DON'T DELAY, DOWNLOAD THE LATEST VERSION"
-            byte "OF FLUXDOCTOR TODAY!",13
-            byte 13
-            byte "DISKETTE IMAGE AND AUDIO FILE VERSIONS",13
-            byte "ARE AVAILABLE FOR IMMEDIATE DOWNLOAD AT",13
-            byte "NO COST FROM:",13
-            byte 13
-            byte GITHUB_URL,0
+            byte "OF FLUXDOCTOR TODAY!",0
 
 M_TITLE
             byte $16,$01 ; ypos, xpos
