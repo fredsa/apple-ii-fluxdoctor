@@ -704,6 +704,9 @@ keystrobe   sta  KBDSTRB
             bcs  nokeycase
             eor  #$20
 nokeycase
+            pha
+            printmessage M_MESSAGE_OK
+            pla
 
             cmp  #KBD_LEFT
             bne  noleft
