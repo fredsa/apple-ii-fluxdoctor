@@ -1,4 +1,4 @@
-# **`FLUXDOCTOR`** V1.2 for Apple II computers
+# **`FLUXDOCTOR`** V1.3 for Apple II computers
 
 Diagnostic utility for real-time troubleshooting, calibration, and repair of
 Apple II floppy disks drives. Runs natively on Apple II computer hardware.
