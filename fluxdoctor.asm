@@ -27,6 +27,11 @@ PGM_LENGTH  equ  PGM_END - pgmstart
 
 
 ; --------------------------------------------------
+; --------------------------------------------------
+GITHUB_URL eqm "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR"
+
+
+; --------------------------------------------------
 ; ROM address use
 ; --------------------------------------------------
 CH          equ  $24
@@ -1138,107 +1143,107 @@ M_PRESS_ANY_KEY
 
 M_HELP1
             byte $02,$00 ; ypos, xpos
-            byte "SCANS DISKS CONTINUOUSLY TO EASE",13
-            byte "DIAGNOSIS AND REPAIR RELATED TASKS.",13
+            byte "ISOLATES INTERMITTENT ELECTROMECHANICAL",13
+            byte "FAULTS. IDENTIFIES LOW QUALITY DISKS.",13
             byte 13
-            byte "REAL-TIME FEEDBACK, SHOWS SECTORS READ",13
-            byte "AND ERRORS NORMALLY HIDDEN BY DOS.",13
+            byte "DIRECT KEY COMMANDS PROVIDE OPERATOR",13
+            byte "CONTROL OF STEPPER AND SPINDLE MOTORS.",13
             byte 13
-            byte "REVEALS SUBTLE MEDIA AND DISK DRIVE",13
-            byte "HARDWARE PROBLEMS.",13
+            byte "CONTINUOUS TRACK SAMPLING EASES TEDIOUS",13
+            byte "DRIVE DIAGNOSIS AND REPAIR WORK.",13
             byte 13
-            byte "CASSETTE TAPE VERSION ALLOWS REPAIRS",13
-            byte "BY USERS WITH ONLY A DEFECTIVE DRIVE.",13
+            byte "DYNAMIC DISPLAY INDICATES SECTORS READ",13
+            byte "AND SOFT ERRORS NORMALLY MASKED BY DOS.",13
             byte 13
-            byte "AUTOSTART ENABLES DRIVE REPAIR WITHOUT",13
-            byte "A WORKING KEYBOARD.",13
+            byte "AUTOSTART ENABLES BENCH TESTING WITHOUT",13
+            byte "AN OPERATIONAL KEYBOARD.",13
             byte 13
-            byte "KEYBOARD SHORTCUTS PROVIDE THE USER",13
-            byte "FULL ACCESS TO LOW-LEVEL DRIVE COMMANDS.",0
+            byte "CASSETTE LOADING PERMITS SERVICING WHEN",13
+            byte "DISKETTE BOOTSTRAP IS INOPERATIVE.",0
 
 M_HELP2
             byte $02,$00 ; ypos, xpos
-            byte "ON A WORKING SYSTEM, A CALIBRATED DRIVE",13
-            byte "WILL RELIABLY READ ALL 16 SECTORS OF A",13
-            byte "FORMATTED TRACK DURING EACH ROTATION",13
-            byte "OF THE DISK. THE SECTOR LIST SHOULD THUS"
-            byte "UPDATE FIVE TIMES PER SECOND (300 RPM).",13
+            byte "IN A PROPERLY ALIGNED DRIVE, ALL 16",13
+            byte "SECTORS OF A TRACK ARE READ DURING EACH",13
+            byte "ROTATION. AT 300 RPM (200 MS/REV), THE",13
+            byte "SECTOR MAP UPDATES FIVE TIMES A SECOND.",13
             byte 13
-            byte "DOS SECTORED DISKS WILL APPEAR TO STROBE"
-            byte "THE SECTOR LIST FROM LEFT TO RIGHT.",13
+            byte "DOS 3.3 INTERLEAVED DISKETTES PRODUCE A",13
+            byte "PROGRESSIVE SWEEP FROM LEFT TO RIGHT.",13
             byte 13
-            byte "PRODOS SECTORED DISKS WILL DISPLAY AN",13
-            byte "IRREGULAR PATTERN BECAUSE THEIR SECTOR",13
-            byte "LAYOUT DIFFERS FROM DOS.",13
+            byte "READ ERRORS WILL DISRUPT THE SEQUENCE.",13
+            byte "PRESS ",KBD_RESEEK|$80," TO REINITIALIZE THE SECTOR MAP",13
+            byte "CLEAR ALL ERROR FLAGS.",13
             byte 13
-            byte "INTERMITTENT READ ERRORS WILL DISRUPT",13
-            byte "THE PATTERN. USE ANY SEEK OPERATION TO",13
-            byte "REINITIALZE THE SECTOR VIEW AND RESET",13
-            byte "ALL ERROR CODES.",13
+            byte "NOTE, PASCAL/PRODOS INTERLEAVED MEDIA",13
+            byte "WILL NOT PRODUCE A SWEEP PATTERN DUE",13
+            byte "TO LOGICAL SECTOR SKEW DIFFERENCES.",13
             byte 13
-            byte "THE WRITE PROTECT STATUS IS UPDATED WITH"
-            byte "EVERY SEEK OPERTION. PRESS ",KBD_RESEEK|$80," TO RE-READ.",0
+            byte "WRITE PROTECT SENSOR IS QUERIED ON EACH",13
+            byte "SEEK STEP. PRESS ",KBD_RESEEK|$80," TO RESAMPLE STATUS.",0
 
 M_HELP3
             byte $02,$00 ; ypos, xpos
             byte "THE EXPERIENCED REPAIR TECHNICIAN USES",13
-            byte "FACTORY WRITTEN DISKS WHENEVER POSSIBLE."
+            byte "FACTORY-RECORDED ALIGNMENT DISKETTES.",13
+            byte "THE TECHNICIAN MAY ALSO EMPLOY DISKETTES"
+            byte "FORMATTED ON A KNOWN-GOOD 48 TPI DRIVE.",13
             byte 13
-            byte "THE PRACTICAL TECHNICIAN MAY ALSO USE",13
-            byte "DISKS THAT WERE FORMATTED BY A KNOWN",13
-            byte "GOOD DISK II OR OTHER 48 TPI DRIVE.",13
+            byte "DISKETTES RECORDED ON 96 TPI DRIVES WILL"
+            byte "INDUCE LOW AMPLITUDE SIGNAL ON 48 TPI",13
+            byte "HEADS. VISIBLE SOFT ERRORS WILL RESULT.",13
             byte 13
-            byte "CAUTION: DISKS WRITTEN BY A 96 TPI DRIVE"
-            byte "PRODUCE WEAK SIGNALS WHEN READ BACK IN",13
-            byte "48 TPI DRIVES. EXPECT TO SEE INTERMITENT"
-            byte "ERRORS THAT ARE NORMALLY HIDDEN FROM THE"
-            byte "USER BY THE O/S IN A WORKING SYSTEM.",13
+            byte "OVERWRITING A 48 TPI TRACK ON A 96 TPI",13
+            byte "DRIVE LEAVES UNERASED MARGINS THAT",13
+            byte "WILL FURTHER EXASTERBATE THE PROBLEM.",13
             byte 13
-            byte "DISKS WRITTEN FIRST BY A 48 TPI DRIVE,",13
-            byte "THEN OVERWRITTEN IN A 96 TPI DRIVE, WILL"
-            byte "PRODUCE HIGHER ERROR RATES.",13
-            byte 13
-            byte "A NEODYMIUM MAGNET MOVED BACK AND FORTH",13
-            byte "OVER A SLEEVED DISK QUICKLY ERASES IT",13
-            byte "FOR RE-FORMATTING. LIKE NEW (OLD STOCK).",0
+            byte "FOR INCREASED RELIABILITY, A NEODYMIUM",13
+            byte "MAGNET MAY BE PASSED OVER A DISKETTE IN",13
+            byte "ITS JACKET TO THOROUGHLY ERASE RESIDUAL",13
+            byte "MAGNETIC FLUX PRIOR TO REFORMATTING.",0
 
 M_HELP4
             byte $02,$00 ; ypos, xpos
-            byte "THE FLYBACK TRANSFORMER IN A CATHODE RAY"
-            byte "TUBE (CRT) TELEVISION SET OR COMPUTER",13
-            byte "MONITOR GENERATES INTERFERENCE THAT",13
-            byte "WILL AFFECT ANY DISK II DRIVE THAT IS",13
-            byte "PLACED UNDERNEATH OR NEXT TO THE CRT.",13
-            byte "",13
-            byte "THE INTERFERENCE IS GREATEST NEAR THE",13
-            byte "FLYBACK, WHICH IS COMMONLY LOCATED IN",13
-            byte "THE LEFT REAR CORNER OF THE MONITOR.",13
-            byte "",13
-            byte "DISKS WRITTEN BY 96 TPI DRIVES MAY BE",13
-            byte "ESPECIALLY DIFFICULT TO READ IN THE",13
-            byte "PRESENCE OF FLYBACK INTERFERENCE.",13
-            byte "",13
-            byte "PREFER DISKS WRITTEN BY 48 TPI DRIVES",13
-            byte "WHEN UTILIZING A CRT.",0
+            byte "ELECTROMAGNETIC INTERFERENCE (EMI) FROM",13
+            byte "THE HORIZONTAL FLYBACK TRANSFORMER OF A",13
+            byte "CRT DISPLAY OR TELEVISION RECEIVER WILL",13
+            byte "INDUCE NOISE INTO DISK II READ HEADS.",13
+            byte 13
+            byte "EMI IS MOST PRONOUNCED ADJACENT TO THE",13
+            byte "TRANSFORMER, COMMONLY LOCATED AT THE",13
+            byte "REAR CORNER OF THE MONITOR CHASSIS.",13
+            byte "POOR READ PERFORMANCE AND VISIBLE SOFT",13
+            byte "ERRORS WILL BE SEEN ON WORKING SYSTEMS.",13
+            byte 13
+            byte "NARROW-TRACK (96 TPI) RECORDED MEDIA",13
+            byte "PRODUCES VERY LOW AMPLITUDE SIGNALS WHEN"
+            byte "READ BY WIDE-TRACK (48 TPI) HEADS.",13
+            byte "UNACCEPTABLE ERROR RATES MAY BE SEEN IN",13
+            byte "THE PRESENCE OF FLYBACK INTERFERENCE.",13
+            byte 13
+            byte "MAINTAIN AT LEAST 12 INCHES SEPARATION",13
+            byte "BETWEEN DISK II AND THE CRT FLYBACK.",0
 
 M_HELP5
-            byte $09,$00 ; ypos, xpos
-            byte "ERROR CODES ARE DOCUMENTED ON THE MAIN",13
-            byte "SCREEN FOR EASY REFERENCE.",0
-            byte 0
+            byte $08,$00 ; ypos, xpos
+            byte "DIAGNOSTIC ERROR FLAGS ARE DEFINED BELOW"
+            byte "AND DISPLAYED ON THE PRIMARY SCREEN:",0
 
 M_HELP6
             byte $0c,$00 ; ypos, xpos
-            byte "AVAIABLE KEYBOARD SHORTCUTS ARE ALSO",13
-            byte "SHOWN ON THE MAIN DIAGNOSTIC SCREEN.",0
-            byte 0
+            byte "OPERATOR COMMAND KEYS ARE ALSO DISPLAYED"
+            byte "ON THE PRIMARY SCREEN FOR CONVENIENCE:",0
 
 M_HELP7
-            byte $0c,$00 ; ypos, xpos
-            byte "DON'T DELAY. DOWNLOAD THE LATEST VERSION"
+            byte $07,$00 ; ypos, xpos
+            byte "DON'T DELAY, DOWNLOAD THE LATEST VERSION"
             byte "OF FLUXDOCTOR TODAY!",13
             byte 13
-            byte "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR",0
+            byte "DISKETTE IMAGE AND AUDIO FILE VERSIONS",13
+            byte "ARE AVAILABLE FOR IMMEDIATE DOWNLOAD AT",13
+            byte "NO COST.",13
+            byte 13
+            byte GITHUB_URL,0
 
 M_TITLE
             byte $16,$01 ; ypos, xpos
@@ -1250,11 +1255,11 @@ M_COPYRIGHT
 
 M_GITHUB
             byte $17,$01 ; ypos, xpos
-            byte "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR"
+            byte GITHUB_URL,0
 
 M_BYE
             byte $00,$00 ; ypos, xpos
-            byte "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR",13
+            byte GITHUB_URL,13
             byte 13
             byte "THANK YOU FOR USING FLUXDOCTOR.",13
             byte "GOODBYE FOR NOW.",13
