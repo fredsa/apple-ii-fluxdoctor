@@ -1120,18 +1120,18 @@ M_PRESS_ANY_KEY
 
 M_HELP1
             byte $02,$00 ; ypos, xpos
-            byte "SCANS DISKS CONTINUOUSLY, DISPLAYS",13
-            byte "SECTORS READ AND MARKS ERRORS NORMALLY",13
-            byte "HIDDEN FROM THE USER.",13
+            byte "DRIVE IS COMMANDED TO SPIN INDEFINITELY",13
+            byte "TO EASE EXTENDED REPAIR RELATED TASKS.",13
+            byte 13
+            byte "SCANS DISKS CONTINUOUSLY, DISPLAYING",13
+            byte "SECTORS READ WHILE MARKING ERRORS",13
+            byte "NORMALLY HIDDEN FROM THE USER.",13
             byte 13
             byte "REVEALS SUBTLE MEDIA AND DISK DRIVE",13
             byte "HARDWARE PROBLEMS.",13
             byte 13
-            byte "DRIVE IS COMMANDED TO SPIN INDEFINITELY",13
-            byte "TO EASE EXTENDED REPAIR RELATED TASKS.",13
-            byte 13
             byte "CASSETTE TAPE VERSION ALLOWS REPAIRS",13
-            byte "FOR USERS WITH ONLY A DEFECTIVE DRIVE.",13
+            byte "BY USERS WITH ONLY A DEFECTIVE DRIVE.",13
             byte 13
             byte "AUTOSTART ENABLES DRIVE REPAIR WITHOUT",13
             byte "A WORKING KEYBOARD.",13
@@ -1146,14 +1146,16 @@ M_HELP2
             byte "FORMATTED TRACK DURING EACH ROTATION",13
             byte "OF THE DISK. THE SECTOR LIST SHOULD THUS"
             byte "UPDATE FIVE TIMES PER SECOND (300 RPM).",13
-            byte "",13
-            byte "WHEN THE CHOSEN SECTOR DISPLAY ORDER",13
-            byte "MATCHES THE PHYSICAL TRACK LAYOUT,",13
-            byte "THE SECTOR LIST WILL APPEAR TO STROBE",13
-            byte "SECTOR READS FROM LEFT TO RIGHT.",13
-            byte "",13
+            byte 13
+            byte "DOS SECTORED DISKS WILL APPEAR TO STROBE"
+            byte "THE SECTOR LIST FROM LEFT TO RIGHT.",13
+            byte 13
+            byte "PRODOS SECTORED DISKS WILL DISPLAY AN",13
+            byte "IRREGULAR PATTERN BECAUSE THEIR SECTOR",13
+            byte "LAYOUT DIFFERS FROM DOS.",13
+            byte 13
             byte "INTERMITTENT READ ERRORS WILL DISRUPT",13
-            byte "THIS FLOW. USE ANY SEEK FUNCTION TO",13
+            byte "THE PATTERN. USE ANY SEEK FUNCTION TO",13
             byte "REINITIALZE THE SECTOR VIEW AND RESET",13
             byte "ALL ERROR CODES.",0
 
