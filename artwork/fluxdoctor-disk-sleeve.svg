@@ -9,7 +9,7 @@
    viewBox="0 0 8.5 11"
    sodipodi:docname="fluxdoctor-disk-sleeve.svg"
    xml:space="preserve"
-   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
    inkscape:export-filename="3.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
@@ -29,12 +29,12 @@
      showguides="true"
      showgrid="true"
      inkscape:zoom="1.1441934"
-     inkscape:cx="415.1396"
-     inkscape:cy="540.55546"
-     inkscape:window-width="1728"
-     inkscape:window-height="1056"
-     inkscape:window-x="0"
-     inkscape:window-y="33"
+     inkscape:cx="361.38995"
+     inkscape:cy="628.39027"
+     inkscape:window-width="1920"
+     inkscape:window-height="1002"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg1"
      inkscape:document-units="in"><inkscape:grid
@@ -223,7 +223,7 @@
        inkscape:label="aging-front-flap" /></g><g
      id="g20"
      inkscape:label="back-content"
-     transform="translate(4.9911193e-8,0.18449006)"
+     transform="rotate(180,4.4552225,7.2897426)"
      style="display:inline"><text
        xml:space="preserve"
        transform="matrix(0.01041667,0,0,0.01041667,-0.55899975,-0.13193761)"
@@ -232,127 +232,127 @@
        inkscape:label="back-text"><tspan
          x="311.71875"
          y="591.8125"
-         id="tspan2">           FLUXDOCTOR V1.3
+         id="tspan1">           FLUXDOCTOR V1.3
 </tspan><tspan
          x="311.71875"
          y="601.8125"
-         id="tspan3">           ===============
+         id="tspan4">           ===============
 </tspan><tspan
          x="311.71875"
          y="611.8125"
-         id="tspan7">
+         id="tspan5">
 </tspan><tspan
          x="311.71875"
          y="621.8125"
-         id="tspan8">           Diagnostic utility for
+         id="tspan6">           Diagnostic utility for
 </tspan><tspan
          x="311.71875"
          y="631.8125"
-         id="tspan11">           troubleshooting, calibration,
+         id="tspan9">           troubleshooting, calibration,
 </tspan><tspan
          x="311.71875"
          y="641.8125"
-         id="tspan52">           and repair of Apple II floppy
+         id="tspan10">           and repair of Apple II floppy
 </tspan><tspan
          x="311.71875"
          y="651.8125"
-         id="tspan53">           disks drives.
+         id="tspan12">           disks drives.
 </tspan><tspan
          x="311.71875"
          y="661.8125"
-         id="tspan54">
+         id="tspan13">
 </tspan><tspan
          x="311.71875"
          y="671.8125"
-         id="tspan55">* Drive spins indefinitely by default
+         id="tspan14">* Drive spins indefinitely by default
 </tspan><tspan
          x="311.71875"
          y="681.8125"
-         id="tspan56">  for easy troubleshooting
+         id="tspan15">  for easy troubleshooting
 </tspan><tspan
          x="311.71875"
          y="691.8125"
-         id="tspan57">
+         id="tspan16">
 </tspan><tspan
          x="311.71875"
          y="701.8125"
-         id="tspan58">* Autostarts, no keyboard required to
+         id="tspan17">* Autostarts, no keyboard required to
 </tspan><tspan
          x="311.71875"
          y="711.8125"
-         id="tspan59">  diagnose floppy drive read performance
+         id="tspan18">  diagnose floppy drive read performance
 </tspan><tspan
          x="311.71875"
          y="721.8125"
-         id="tspan60">
+         id="tspan19">
 </tspan><tspan
          x="311.71875"
          y="731.8125"
-         id="tspan61">* Provides direct low-level control to
+         id="tspan20">* Provides direct low-level control to
 </tspan><tspan
          x="311.71875"
          y="741.8125"
-         id="tspan62">  stop/start motor and seek heads
+         id="tspan21">  stop/start motor and seek heads
 </tspan><tspan
          x="311.71875"
          y="751.8125"
-         id="tspan63">
+         id="tspan22">
 </tspan><tspan
          x="311.71875"
          y="761.8125"
-         id="tspan64">* Real-time display of sector read
+         id="tspan23">* Real-time display of sector read
 </tspan><tspan
          x="311.71875"
          y="771.8125"
-         id="tspan81">  performance and errors
+         id="tspan24">  performance and errors
 </tspan><tspan
          x="311.71875"
          y="781.8125"
-         id="tspan82">
+         id="tspan25">
 </tspan><tspan
          x="311.71875"
          y="791.8125"
-         id="tspan83">* Exposes weak reads and subtle
+         id="tspan26">* Exposes weak reads and subtle
 </tspan><tspan
          x="311.71875"
          y="801.8125"
-         id="tspan84">  intermittent errors hidden by DOS
+         id="tspan27">  intermittent errors hidden by DOS
 </tspan><tspan
          x="311.71875"
          y="811.8125"
-         id="tspan85">
+         id="tspan28">
 </tspan><tspan
          x="311.71875"
          y="821.8125"
-         id="tspan86">* Distinguishes seek, checksum, and
+         id="tspan29">* Distinguishes seek, checksum, and
 </tspan><tspan
          x="311.71875"
          y="831.8125"
-         id="tspan87">  sector prologue/epilogue errors
+         id="tspan30">  sector prologue/epilogue errors
 </tspan><tspan
          x="311.71875"
          y="841.8125"
-         id="tspan88">
+         id="tspan31">
 </tspan><tspan
          x="311.71875"
          y="851.8125"
-         id="tspan89">* Can be used to diagnose poorly written
+         id="tspan32">* Can be used to diagnose poorly written
 </tspan><tspan
          x="311.71875"
          y="861.8125"
-         id="tspan90">  or misaligned floppy disk drives
+         id="tspan33">  or misaligned floppy disk drives
 </tspan><tspan
          x="311.71875"
          y="871.8125"
-         id="tspan91">
+         id="tspan34">
 </tspan><tspan
          x="311.71875"
          y="881.8125"
-         id="tspan92">
+         id="tspan35">
 </tspan><tspan
          x="311.71875"
          y="891.8125"
-         id="tspan93">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><image
+         id="tspan36">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><image
        width="0.73170972"
        height="0.73170972"
        preserveAspectRatio="none"
@@ -381,19 +381,19 @@
        y="0"><tspan
          x="311.71875"
          y="801.1875"
-         id="tspan94">
+         id="tspan37">
 </tspan><tspan
          x="311.71875"
          y="811.1875"
-         id="tspan95">   VERSION 1.3
+         id="tspan38">   VERSION 1.3
 </tspan><tspan
          x="311.71875"
          y="821.1875"
-         id="tspan96">
+         id="tspan39">
 </tspan><tspan
          x="311.71875"
          y="831.1875"
-         id="tspan97">SERIAL 26090042</tspan></text><image
+         id="tspan40">SERIAL 26090042</tspan></text><image
        width="3.6742237"
        height="0.58930439"
        preserveAspectRatio="none"
@@ -417,7 +417,7 @@
      inkscape:label="front-url"><tspan
        x="311.71875"
        y="591.8125"
-       id="tspan98">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><text
+       id="tspan41">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><text
      xml:space="preserve"
      transform="matrix(0,-0.01041667,0.01041667,0,-7.2222843,7.9787303)"
      id="text4-2-1"
@@ -427,19 +427,19 @@
      y="0"><tspan
        x="311.71875"
        y="801.1875"
-       id="tspan99">
+       id="tspan42">
 </tspan><tspan
        x="311.71875"
        y="811.1875"
-       id="tspan100">   VERSION 1.3
+       id="tspan43">   VERSION 1.3
 </tspan><tspan
        x="311.71875"
        y="821.1875"
-       id="tspan101">
+       id="tspan44">
 </tspan><tspan
        x="311.71875"
        y="831.1875"
-       id="tspan102">SERIAL 26090042</tspan></text><g
+       id="tspan45">SERIAL 26090042</tspan></text><g
      id="g23"
      inkscape:label="safe area"
      style="display:none"><rect
