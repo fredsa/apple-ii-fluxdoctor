@@ -3,8 +3,8 @@
 ; Copyright Fred Sauer 2026
 ; See LICENSE.txt
 ;
-; Apple Disk II diagnostic utility for real-time
-; troubleshooting, diagnositcs, and repair.
+; Diagnostic utility for real-time troubleshooting,
+; calibration, and repair of Apple II floppy drives.
 ; --------------------------------------------------
             processor 6502
             org  1

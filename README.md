@@ -11,14 +11,16 @@ Apple II floppy disks drives. Runs natively on Apple II computer hardware.
 - Distinguishes seek, checksum, and sector prologue/epilogue errors
 - Can be used to diagnose poorly written or misaligned floppy disk drives
 
-Available as a bootable (140kB) DOS 3.3 floppy disk image (`*.DO`) from the
-**Releases** page.
+Available in multiple formats from the
+[Releases](https://github.com/fredsa/apple-ii-fluxdoctor/releases) page:
+- Autostart (140kB) DOS 3.3 floppy disk image (`*.DO`)
+- Autostart cassette tape audio file (`*.WAV`)
+- Machine language monitor type-in listing (`*.MON`)
 
 <img width="50%" height="50%" src="fluxdoctor.png">
 
-`FLUXDOCTOR` requires a DOS 3.3 environment as it utilizes DOS `RWTS` routines
-for track seeks. All other functions are performed by accessing the hardware
-directly directly from 6502 assembly.
+`FLUXDOCTOR` is written in 6502 assembly to provide low-level stepper and
+spindle motor control without the need for a working DOS environment.
 
 
 # Build prerequisites
