@@ -23,6 +23,18 @@ Available in multiple formats from the
 spindle motor control without the need for a working DOS environment.
 
 
+# Rendering artwork
+
+SVG assets in the `artwork/` folder utilize the following fonts:
+
+1. Arial
+
+2. [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), available
+   in the `artwork/Press_Start_2P/` folder.
+
+Assets will not render correctly without these fonts installed.
+
+
 # Build prerequisites
 
 To build FLUXDOCTOR from source, you'll need the following:
