@@ -764,6 +764,12 @@ noh
             jmp  nokey
 nor
 
+            cmp #'S
+            bne nos
+            jsr askslot
+            jmp  nokey
+nos
+
             cmp  #$1B         ; ESC
             bne  noesc
             lda  #$FF
@@ -825,6 +831,57 @@ nodrive1
 nodrive2
 
 nokey       rts
+
+
+; --------------------------------------------------
+; Ask slot 1-7, ESC to cancel
+; --------------------------------------------------
+askslot     printmessageinv M_MESSAGE_ASK_SLOT
+askslotkey  lda  KBD
+            bmi  askslotstrobe
+            jmp  askslotkey
+askslotstrobe
+            sta  KBDSTRB
+            and  #$7f
+            cmp  #$1B         ; ESC
+            beq  noslotchange
+            cmp  #'1
+            bmi  askslotkey
+            cmp  #'7 + 1
+            bpl  askslotkey
+            and  #$f ; 0-9
+            tay ; save desired slot
+            ldx  DISK_SLOT    ; restore X
+            lda  MOTOROFF,x   ; motor off
+            lda  #CODE_N
+            sta  RUNNING
+            lda  DISK_DRIVE
+            cmp  #1
+            bne  askslotdrive2
+            lda  DRV1TRK,Y
+            jmp  noaskslot
+askslotdrive2
+            lda  DRV2TRK,Y
+noaskslot   lsr
+            cmp  #34 + 1      ; highest allowed track
+            bmi  trackok
+            lda  #0
+trackok     sta  DISK_TRACK
+            tya ; restore desired slot
+            asl
+            asl
+            asl
+            asl
+            sta  DISK_SLOT
+            ldx  DISK_SLOT    ; restore X
+            lda  DRV0EN,x
+            lda  MOTORON,x    ; motor on
+            lda  #CODE_Y
+            sta  RUNNING
+            jsr resetscreen
+noslotchange
+            printmessage M_MESSAGE_OK
+            rts
 
 
 ; --------------------------------------------------
@@ -1135,6 +1192,9 @@ DATA_FIELD_ERR_ADDR_E equ text_row_0b+39
 
 MESSAGE_YPOS equ $08
 
+M_MESSAGE_ASK_SLOT
+            byte MESSAGE_YPOS, $00 ; ypos, xpos
+            byte "           SELECT SLOT ",'1|$80," - ",'7|$80,"            ",0
 M_MESSAGE_BAD_TRACK
             byte MESSAGE_YPOS, 00 ; ypos, xpos
             byte "NOT ON TARGET TRACK. PRESS ",KBD_RESEEK|$80," TO RE-SEEK.",0
@@ -1156,7 +1216,7 @@ M_KEYBOARD_SHORTCUTS
             byte 'H|$80,"ELP   "
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
-            byte "       MOTOR O",'N|$80," OF",'F|$80
+            byte 'S|$80,"LOT   MOTOR O",'N|$80," OF",'F|$80
             byte "   ",KBD_RESEEK|$80,"ESEEK    QUIT ",'E|$80,'S|$80,'C|$80,0
 
 M_HELP_FLUXDOCTOR
