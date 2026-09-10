@@ -103,22 +103,22 @@ CROUT       equ  $FD8E
 DRIVNO      equ  $35
 CURTRK      EQU  $478 ; CURRENT TRACK ON ENTRY.
 DRV1TRK     equ  $478
-;                $479 (DRV1TRK),1 = Slot 1
-;                $47a (DRV1TRK),2 = Slot 2
-;                $47b (DRV1TRK),3 = Slot 3
-;                $47c (DRV1TRK),4 = Slot 4
-;                $47d (DRV1TRK),5 = Slot 5
-;                $47e (DRV1TRK),6 = Slot 6
-;                $47f (DRV1TRK),7 = Slot 7
+;                $479 (DRV1TRK),1 = Slot 1 half-track
+;                $47a (DRV1TRK),2 = Slot 2 half-track
+;                $47b (DRV1TRK),3 = Slot 3 half-track
+;                $47c (DRV1TRK),4 = Slot 4 half-track
+;                $47d (DRV1TRK),5 = Slot 5 half-track
+;                $47e (DRV1TRK),6 = Slot 6 half-track
+;                $47f (DRV1TRK),7 = Slot 7 half-track
 
 DRV2TRK     equ  $4F8
-;                $4f9 (DRV2TRK),1 = Slot 1
-;                $4fa (DRV2TRK),2 = Slot 2
-;                $4fb (DRV2TRK),3 = Slot 3
-;                $4fc (DRV2TRK),4 = Slot 4
-;                $4fd (DRV2TRK),5 = Slot 5
-;                $4fe (DRV2TRK),6 = Slot 6
-;                $4ff (DRV2TRK),7 = Slot 7
+;                $4f9 (DRV2TRK),1 = Slot 1 half-track
+;                $4fa (DRV2TRK),2 = Slot 2 half-track
+;                $4fb (DRV2TRK),3 = Slot 3 half-track
+;                $4fc (DRV2TRK),4 = Slot 4 half-track
+;                $4fd (DRV2TRK),5 = Slot 5 half-track
+;                $4fe (DRV2TRK),6 = Slot 6 half-track
+;                $4ff (DRV2TRK),7 = Slot 7 half-track
 
 ; --------------------------------------------------
 ; IOB table
