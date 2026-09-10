@@ -755,17 +755,20 @@ nofour
             ldx  DISK_SLOT    ; restore X
             lda  MOTOROFF,x   ; motor off
             jsr help
+            jmp  nokey
 noh
 
             cmp #KBD_RESEEK
             bne nor
             jsr fixtrack
+            jmp  nokey
 nor
 
             cmp  #$1B         ; ESC
             bne  noesc
             lda  #$FF
             sta  EXIT_FLAG
+            jmp  nokey
 noesc
             cmp  #'N
             bne  nomotoron
@@ -773,6 +776,7 @@ noesc
             lda  MOTORON,x    ; motor on
             lda  #CODE_Y
             sta  RUNNING
+            jmp  nokey
 nomotoron
 
             cmp  #'F
@@ -781,6 +785,7 @@ nomotoron
             lda  MOTOROFF,x   ; motor off
             lda  #CODE_N
             sta  RUNNING
+            jmp  nokey
 nomotoroff
 
             cmp  #'1
@@ -798,6 +803,7 @@ nomotoroff
             lda  MOTORON,x    ; motor on
             lda  #CODE_Y
             sta  RUNNING
+            jmp  nokey
 nodrive1
 
             cmp  #'2
@@ -815,6 +821,7 @@ nodrive1
             lda  MOTORON,x    ; motor on
             lda  #CODE_Y
             sta  RUNNING
+            jmp  nokey
 nodrive2
 
 nokey       rts
