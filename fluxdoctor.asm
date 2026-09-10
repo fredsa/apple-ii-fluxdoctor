@@ -1204,15 +1204,14 @@ M_MESSAGE_OK
 
 M_ERROR_CODES
             byte $0d,$00 ; ypos, xpos
-            byte "ERROR",13
-            byte "CODES: _EEK  _ISSING  CHEC_SUM  _PILOGUE",0
-ERR_CODE_SEEK_ADDR equ text_row_0e+7
-ERR_CODE_MISSING_ADDR equ text_row_0e+13
-ERR_CODE_CHECKSUM_ADDR equ text_row_0e+26
-ERR_CODE_EPILOGUE_ADDR equ text_row_0e+32
+            byte "(ERRS:_EEK  _ISSING  CHEC_SUM  _PILOGUE)",0
+ERR_CODE_SEEK_ADDR equ text_row_0d+6
+ERR_CODE_MISSING_ADDR equ text_row_0d+12
+ERR_CODE_CHECKSUM_ADDR equ text_row_0d+25
+ERR_CODE_EPILOGUE_ADDR equ text_row_0d+31
 
 M_KEYBOARD_SHORTCUTS
-            byte $11,$00 ; ypos, xpos
+            byte $12,$00 ; ypos, xpos
             byte 'H|$80,"ELP   "
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
