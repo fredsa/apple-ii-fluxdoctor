@@ -126,6 +126,7 @@ rm -f out/fluxdoctor.out
 rm -f out/fluxdoctor.bin
 rm -f out/fluxdoctor.do
 rm -f out/fluxdoctor.dsk
+rm -f out/fluxdoctor-basic.bin
 rm -f out/fluxdoctor-basic.wav
 rm -f out/fluxdoctor-insta-disk.wav
 rm -f out/fluxdoctor-basic.mon
