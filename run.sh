@@ -20,16 +20,19 @@ case $os_name in
     emulator='/Applications/Virtual ][.app/Contents/MacOS/Virtual ]['
     emulatorurl="https://www.virtualii.com/"
     AC="$HOME/.local/bin/ac-mac-aarch64-13.1"
+    C2T="c2t"
     ;;
   Linux) # Linux
     emulator="todo"
     emulatorurl="todo"
     AC="$HOME/ac-linux-*-13.1.exe"
+    C2T="c2t"
     ;;
   MINGW64*) # Windows Git Bash
     emulator="AppleWin"
     emulatorurl="https://github.com/AppleWin/AppleWin"
     AC="$HOME/ac-windows-amd64-13.1.exe"
+    C2T="c2t.exe"
     ;;
   *)
     echo "ERROR: Unknown OS `$os_name`" 1>&2
@@ -102,6 +105,15 @@ if ! type -p fluxrider >/dev/null 2>&1; then
     exit 1
 fi
 
+if ! type -p "$C2T" >/dev/null 2>&1; then
+    echo "ERROR missing executable:" 1>&2
+    echo "  $C2T" 1>&2
+    echo "" 1>&2
+    echo "Please install $C2T from:" 1>&2
+    echo "  https://github.com/datajerk/c2t" 1>&2
+    exit 1
+fi
+
 if [[ ! -r fluxdoctor.asm ]]; then
     echo "MISSING: fluxdoctor.asm" 1>&2
     exit 1
@@ -110,12 +122,14 @@ fi
 echo "====================================================================="
 echo "Cleanup output folder: out/"
 mkdir -p out
-rm -f out/fluxdoctor.do
 rm -f out/fluxdoctor.out
 rm -f out/fluxdoctor.bin
+rm -f out/fluxdoctor.do
+rm -f out/fluxdoctor.dsk
 rm -f out/fluxdoctor-basic.wav
+rm -f out/fluxdoctor-insta-disk.wav
 rm -f out/fluxdoctor-basic.mon
-
+  
 echo
 echo "====================================================================="
 echo "Compiling tape:"
@@ -157,13 +171,13 @@ if [ "$disk" == "true" ]; then
   echo "====================================================================="
   echo "Adding FLUXDOCTOR program to disk image:"
   echo "  out/fluxdoctor-basic.bin -> FLUXDOCTOR"
-  $AC -p out/fluxdoctor.do FLUXDOCTOR A < out/fluxdoctor-basic.bin
+  "$AC" -p out/fluxdoctor.do FLUXDOCTOR A < out/fluxdoctor-basic.bin
 
   echo
   echo "====================================================================="
   echo "Final disk image is ready:"
   echo "  out/fluxdoctor.do"
-  $AC -ll out/fluxdoctor.do
+  "$AC" -ll out/fluxdoctor.do
 
   echo
   echo "====================================================================="
@@ -178,6 +192,16 @@ if [ "$tape" == "true" ]; then
   echo "Creating cassette bootable WAV file:"
   echo "  out/fluxdoctor-basic.bin -> out/fluxdoctor-basic.wav"
   fluxrider out/fluxdoctor-basic.bin out/fluxdoctor-basic.wav
+fi
+
+if [  "$disk" == "true" -a "$tape" == "true" ]; then
+  echo
+  echo "====================================================================="
+  echo "Creating magic WAV file (automatically formats and writes disk):"
+  echo "  out/fluxdoctor.do -> out/fluxdoctor.dsk"
+  echo "  out/fluxdoctor.dsk -> out/fluxdoctor-insta-disk.wav"
+  cp out/fluxdoctor.do out/fluxdoctor.dsk
+  "$C2T" out/fluxdoctor.dsk out/fluxdoctor-insta-disk.wav
 fi
 
 if [ "$monitor" == "true" ]; then
