@@ -1154,11 +1154,8 @@ M_VERSION
 
 M_TARGET_TRACK
             byte $01,$00 ; ypos, xpos
-            byte "TARGET VOL __   TRK __   SEC __   ERR __",0
-; TARGET_VOL_ADDR equ text_row_01+11
+            byte "TARGET VOL __   TRK __   SEC __",0
 TARGET_TRACK_ADDR equ text_row_01+20
-; TARGET_SEC_ADDR equ text_row_01+29
-; TARGET_ERR_ADDR equ text_row_01+38
 
 M_DIVIDER
             byte $02,$00 ; ypos, xpos
