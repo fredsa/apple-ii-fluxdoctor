@@ -1208,7 +1208,8 @@ ERR_CODE_CHECKSUM_ADDR equ text_row_0d+25
 ERR_CODE_EPILOGUE_ADDR equ text_row_0d+31
 
 M_KEYBOARD_SHORTCUTS
-            byte $12,$00 ; ypos, xpos
+            byte $11,$00 ; ypos, xpos
+            byte "========================================",13
             byte 'H|$80,"ELP   "
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
