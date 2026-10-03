@@ -27,6 +27,7 @@ PGM_LENGTH  equ  PGM_END - pgmstart
 
 
 ; --------------------------------------------------
+; GitHub URL string
 ; --------------------------------------------------
 GITHUB_URL eqm "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR"
 
