@@ -74,6 +74,9 @@ CALC_CHKSUM equ  $FE
 ; $0200 - $02FF - GETLN Line Input Buffer
 
 ; $0300 - $03CF - Free Space for Machine Language, Shape Table, etc.
+DISK_SLOT   equ  $0300
+DISK_DRIVE  equ  $0301
+DISK_TRACK  equ  $0302
 
 ; $0400 - $07FF - Text Video Page and Peripheral Screenholes
 
@@ -122,41 +125,6 @@ DRV2TRK     equ  $4F8
 ;                $4fe (DRV2TRK),6 = Slot 6 half-track
 ;                $4ff (DRV2TRK),7 = Slot 7 half-track
 
-; --------------------------------------------------
-; IOB table
-; --------------------------------------------------
-DISK_IOB    equ  $B7E8 ; IOB type indicator, must be $01
-DISK_SLOT   equ  $B7E9 ; Slot << 4
-DISK_DRIVE  equ  $B7EA
-;DISK_VOL    equ  $B7EB ; Volume $01 - $FE, $00 = any
-DISK_TRACK  equ  $B7EC
-;DISK_SECTOR equ  $B7ED
-;DISK_DCTPTR equ  $B7EE ; Low-order byte of device characteristic table (DCT)
-;                $B7EF ; High-order byte of DCT
-;DISK_BUFFPTR equ $B7F0 ; data buffer pointer
-;                $B7F1
-
-;DISK_BUFFLEN    $B7F2 ; data length
-;                $B7F3 ;
-
-;DISK_CMD    equ  $B7F4 ; disk command
-;DISK_ERR    equ  $B7F5 ; status error code (or last byte of bufer read in)
-;                $B7F6 ; actual volume (or status modifier?)
-;OSLOT       equ  $B7F7 ; previous slot << 4
-;ODRIV       equ  $B7F8 ; previous drive
-
-;DISK_CMD_SEEK equ $00
-;DISK_CMD_READ equ $01
-;DISK_CMD_WRITE equ $02
-;DISK_CMD_FORMAT equ $04
-;DISK_CMD_WRITE_BOOT equ $08
-
-;DISK_ERR_NONE equ $00 ; no errors
-;DISK_ERR_INIT equ $08 ; error during initialization
-;DISK_ERR_WP equ  $10  ; write protect error
-;DISK_ERR_VOL equ $20  ; volume mismatch error
-;DISK_ERR_DRIVE equ $40 ; drive error
-;DISK_ERR_READ equ $80 ; read error (obsolete)
 
 ; --------------------------------------------------
 ; Hardware registers
