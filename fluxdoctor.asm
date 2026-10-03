@@ -45,6 +45,7 @@ CV          equ  $25
 EXIT_FLAG   equ  $06
 DATA_CHECKSUM equ $07
 RUNNING     equ  $08
+HELP_SCREEN equ $09
 
 ; $1D-$1E - Free Space
 
@@ -878,7 +879,7 @@ trackok     sta  DISK_TRACK
             lda  MOTORON,x    ; motor on
             lda  #CODE_Y
             sta  RUNNING
-            jsr resetscreen
+            jsr  resetscreen
 noslotchange
             printmessage M_MESSAGE_OK
             rts
@@ -887,44 +888,98 @@ noslotchange
 ; --------------------------------------------------
 ; Helpers
 ; --------------------------------------------------
+printmsg
+            stx  PTRL
+            sta  PTRH
+            ldy  #0
+            lda  (PTRL),y
+            sta  CV
+            jsr  VTAB
+            iny
+            lda  (PTRL),y
+            sta  CH
+            clc
+            iny
+printmsgloop
+            lda  (PTRL),y ; get char
+            beq  printmsgend
+            bpl  printmsgnotinv  ; ORA #$80 chars = invert
+            and  #$3f
+            jmp  printmsgcout
+printmsgnotinv
+            ora  #$80
+printmsgcout
+            jsr  COUT
+            inc  PTRL
+            bne  printmsgloop
+            inc  PTRH
+            jmp  printmsgloop
+printmsgend rts
+
 help
-            jsr HOME
-            printmessage M_HELP1
-            jsr helpanykey
+            lda  #00
+            sta  HELP_SCREEN
 
-            printmessage M_HELP2
-            jsr helpanykey
+helploop    jsr  HOME
+            lda  <#M_HELP_PTRS
+            sta  PTRL
+            lda  >#M_HELP_PTRS
+            sta  PTRH
+            lda  HELP_SCREEN
+            asl
+            tay
+            lda  PTRL
+            lda  PTRH
+            lda  (PTRL),y
+            tax
+            iny
+            lda  (PTRL),y
+            bne  helpprintmsg
+            jmp  helpend
+helpprintmsg
+            jsr  printmsg
 
-            printmessage M_HELP3
-            jsr helpanykey
-
-            printmessage M_HELP4
-            jsr helpanykey
-
-            printmessage M_HELP5
-            jsr errorcodereference
-            jsr helpanykey
-
-            printmessage M_HELP6
+            lda  HELP_SCREEN
+            cmp  #4
+            bne  nothelp4
+            jsr  errorcodereference
+            jmp  helpfooter
+nothelp4
+            cmp  #5
+            bne  nothelp5
             printmessage M_KEYBOARD_SHORTCUTS
-            jsr helpanykey
+nothelp5
 
-            printmessage M_HELP7
-            jsr helpanykey
+helpfooter  printmessage M_HELP_FLUXDOCTOR
+            printmessage M_HELP_NAVIGATION
+            renderhex HELP_SCREEN,M_HELP_PAGE_NO
+            renderhex HELP_SCREEN_COUNT,M_HELP_PAGE_OF
+nohelpkey   lda  KBD
+            bpl  nohelpkey
+            sta  KBDSTRB
+            and  #$7f
+            cmp  #$1B         ; ESC
+            beq  helpend
+            cmp  #KBD_LEFT
+            bne  nohelpprev
+            lda  HELP_SCREEN
+            beq  nohelpprev
+            dec  HELP_SCREEN
+            jmp  helploop
+nohelpprev
+            cmp  #KBD_RIGHT
+            bne  nohelpnext
+            lda  HELP_SCREEN
+            cmp  HELP_SCREEN_COUNT
+            beq  nohelpnext
+            inc  HELP_SCREEN
+            jmp  helploop
+nohelpnext
+            jmp  nohelpkey
 
-            printmessage M_HELP8
-            jsr helpanykey
-
-            jsr fullresetscreen
+helpend     jsr  fullresetscreen
             rts
 
-helpanykey  printmessage M_HELP_FLUXDOCTOR
-            printmessageinv M_PRESS_ANY_KEY
-noanykey    lda KBD
-            bpl noanykey
-            sta KBDSTRB
-            jsr HOME
-            rts
 
 errorcodereference
             printmessage M_ERROR_CODES
@@ -939,6 +994,7 @@ errorcodereference
             rts
 
 fullresetscreen
+            jsr HOME
             jsr errorcodereference
             printmessage M_KEYBOARD_SHORTCUTS
             printmessageinv M_TITLE
@@ -1220,11 +1276,20 @@ M_HELP_FLUXDOCTOR
             byte $00,$00 ; ypos, xpos
             byte 'F|$80,'L|$80,'U|$80,'X|$80,'D|$80,'O|$80,'C|$80,'T|$80,'O|$80,'R|$80,0
 
-M_PRESS_ANY_KEY
-            byte $17,$07 ; ypos, xpos
-            byte "PRESS ANY KEY TO CONTINUE",0
+M_HELP_NAVIGATION
+            byte $17,$00 ; ypos, xpos
+            byte "__/__    PREV ",'<|$80,'-|$80,"  NEXT ",'-|$80,'>|$80,"      EXIT ",'E|$80,'S|$80,'C|$80,0
+M_HELP_PAGE_NO equ text_row_17+0
+M_HELP_PAGE_OF equ text_row_17+3
 
-M_HELP1
+
+HELP_SCREEN_COUNT byte 7
+M_HELP_PTRS
+            word M_HELP0,M_HELP1,M_HELP2,M_HELP3
+            word M_HELP4,M_HELP5,M_HELP6,M_HELP7
+            word $0000
+
+M_HELP0
             byte $00,$0b ; ypos, xpos
             byte "DIAGNOSIS AND REPAIR UTILITY",13
             byte 13
@@ -1246,7 +1311,7 @@ M_HELP1
             byte "CASSETTE LOADING PERMITS SERVICING WHEN",13
             byte "DISKETTE BOOTSTRAP IS INOPERATIVE.",0
 
-M_HELP2
+M_HELP1
             byte $00,$0b ; ypos, xpos
             byte "SECTOR DISPLAY AND STATUS",13
             byte 13
@@ -1269,7 +1334,7 @@ M_HELP2
             byte "WRITE PROTECT SENSOR IS QUERIED ON EACH",13
             byte "SEEK STEP. PRESS ",KBD_RESEEK|$80," TO RESAMPLE STATUS.",0
 
-M_HELP3
+M_HELP2
             byte $00,$0b ; ypos, xpos
             byte "DIAGNOSTIC TOOLS",13
             byte 13
@@ -1291,7 +1356,7 @@ M_HELP3
             byte "ITS JACKET TO THOROUGHLY ERASE RESIDUAL",13
             byte "MAGNETIC FLUX PRIOR TO REFORMATTING.",0
 
-M_HELP4
+M_HELP3
             byte $00,$0b ; ypos, xpos
             byte "EMI CONSIDERATIONS",13
             byte 13
@@ -1315,21 +1380,21 @@ M_HELP4
             byte "MAINTAIN AT LEAST 12 INCHES SEPARATION",13
             byte "BETWEEN DISK II AND THE CRT FLYBACK.",0
 
-M_HELP5
+M_HELP4
             byte $00,$0b ; ypos, xpos
             byte "ERROR FLAGS",13
             byte 13,13,13,13,13,13,13
             byte "DIAGNOSTIC ERROR FLAGS ARE DEFINED BELOW"
             byte "AND DISPLAYED ON THE PRIMARY SCREEN:",0
 
-M_HELP6
+M_HELP5
             byte $00,$0b ; ypos, xpos
             byte "COMMAND KEYS",13
             byte 13,13,13,13,13,13,13,13,13
             byte "OPERATOR COMMAND KEYS ARE ALSO DISPLAYED"
             byte "ON THE PRIMARY SCREEN FOR CONVENIENCE:",0
 
-M_HELP7
+M_HELP6
             byte $00,$0b ; ypos, xpos
             byte "SOFTWARE UPDATES",13
             byte 13
@@ -1343,7 +1408,7 @@ M_HELP7
             byte "DON'T DELAY, DOWNLOAD THE LATEST VERSION"
             byte "OF FLUXDOCTOR TODAY!",0
 
-M_HELP8
+M_HELP7
             byte $00,$0b ; ypos, xpos
             byte "CUSTOMER CORRESPONDENCE",13
             byte 13
