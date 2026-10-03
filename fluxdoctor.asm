@@ -937,11 +937,6 @@ helpprintmsg
             jsr  printmsg
 
             lda  HELP_SCREEN
-            cmp  #4
-            bne  nothelp4
-            jsr  errorcodereference
-            jmp  helpfooter
-nothelp4
             cmp  #5
             bne  nothelp5
             printmessage M_KEYBOARD_SHORTCUTS
@@ -961,40 +956,23 @@ nohelpkey   lda  KBD
             cmp  #KBD_LEFT
             bne  nohelpprev
             lda  HELP_SCREEN
-            beq  nohelpprev
+            beq  nohelpkey
             dec  HELP_SCREEN
             jmp  helploop
 nohelpprev
-            cmp  #KBD_RIGHT
-            bne  nohelpnext
             lda  HELP_SCREEN
             cmp  HELP_SCREEN_COUNT
-            beq  nohelpnext
+            beq  helpend
             inc  HELP_SCREEN
             jmp  helploop
-nohelpnext
             jmp  nohelpkey
 
 helpend     jsr  fullresetscreen
             rts
 
 
-errorcodereference
-            printmessage M_ERROR_CODES
-            lda  #ERR_CODE_SEEK
-            sta  ERR_CODE_SEEK_ADDR
-            lda  #ERR_CODE_MISSING
-            sta  ERR_CODE_MISSING_ADDR
-            lda  #ERR_CODE_CHECKSUM
-            sta  ERR_CODE_CHECKSUM_ADDR
-            lda  #ERR_CODE_EPILOGUE
-            sta  ERR_CODE_EPILOGUE_ADDR
-            rts
-
-
 fullresetscreen
             jsr HOME
-            jsr errorcodereference
             printmessage M_KEYBOARD_SHORTCUTS
             printmessageinv M_TITLE
             printmessage M_COPYRIGHT
@@ -1261,23 +1239,14 @@ M_MESSAGE_OK
             byte MESSAGE_YPOS, 00 ; ypos, xpos
             byte "                                        ",0
 
-M_ERROR_CODES
-            byte $0d,$00 ; ypos, xpos
-            byte "(ERRS:_EEK  _ISSING  CHEC_SUM  _PILOGUE)",0
-ERR_CODE_SEEK_ADDR equ text_row_0d+6
-ERR_CODE_MISSING_ADDR equ text_row_0d+12
-ERR_CODE_CHECKSUM_ADDR equ text_row_0d+25
-ERR_CODE_EPILOGUE_ADDR equ text_row_0d+31
-
 M_KEYBOARD_SHORTCUTS
-            byte $11,$00 ; ypos, xpos
+            byte $0f,$00 ; ypos, xpos
             byte "========================================",13
             byte 'H|$80,"ELP   "
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
             byte 'S|$80,"LOT   MOTOR O",'N|$80," OF",'F|$80
             byte "   ",KBD_RESEEK|$80,"ESEEK    QUIT ",'E|$80,'S|$80,'C|$80,0
-
 M_HELP_FLUXDOCTOR
             byte $00,$00 ; ypos, xpos
             byte 'F|$80,'L|$80,'U|$80,'X|$80,'D|$80,'O|$80,'C|$80,'T|$80,'O|$80,'R|$80,0
@@ -1389,16 +1358,17 @@ M_HELP3
 M_HELP4
             byte $00,$0b ; ypos, xpos
             byte "ERROR FLAGS",13
-            byte 13,13,13,13,13,13,13
-            byte "DIAGNOSTIC ERROR FLAGS ARE DEFINED BELOW"
-            byte "AND DISPLAYED ON THE PRIMARY SCREEN:",0
+            byte 13
+            byte "1. ",ERR_CODE_SEEK|$80,"EEK ERROR / UNEXPECTED TRACK",13,13
+            byte "2. ",ERR_CODE_MISSING|$80,"ISSING ADDRESS OR DATA FIELD",13,13
+            byte "3. INVALID CHEC",ERR_CODE_CHECKSUM|$80,"SUM",13,13
+            byte "4. INVALID ",ERR_CODE_EPILOGUE|$80,"PILOGUE, BAD BYTE(S)",0
 
 M_HELP5
             byte $00,$0b ; ypos, xpos
             byte "COMMAND KEYS",13
-            byte 13,13,13,13,13,13,13,13,13
-            byte "OPERATOR COMMAND KEYS ARE ALSO DISPLAYED"
-            byte "ON THE PRIMARY SCREEN FOR CONVENIENCE:",0
+            byte 13,13,13,13,13,13,13,13,13,13,13,13
+            byte "USE THESE KEYS TO CONTROL FLUXDOCTOR:",0
 
 M_HELP6
             byte $00,$0b ; ypos, xpos
