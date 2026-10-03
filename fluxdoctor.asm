@@ -791,32 +791,26 @@ askslotstrobe
             lda  MOTOROFF,x   ; motor off
             lda  #CODE_N
             sta  RUNNING
-            lda  DISK_DRIVE
-            cmp  #1
-            bne  askslotdrive2
-            lda  DRV1TRK,Y
-            jmp  noaskslot
-askslotdrive2
-            lda  DRV2TRK,Y
-noaskslot   lsr
-            cmp  #34 + 1      ; highest allowed track
-            bmi  trackok
-            lda  #0
-trackok     sta  DISK_TRACK
-            tya ; restore desired slot
+            tya               ; restore desired slot
             asl
             asl
             asl
             asl
             sta  DISK_SLOT
+            jsr  setdisktrack
+            jsr  resetscreen
             ldx  DISK_SLOT    ; restore X
-            lda  #1
-            sta  DISK_DRIVE
+            lda  DISK_DRIVE
+            cmp  #1
+            bne  askslotdrive2
             lda  DRV0EN,x     ; drive 1
+            jmp  askslotmotoron
+askslotdrive2
+            lda  DRV1EN,x     ; drive 2
+askslotmotoron
             lda  MOTORON,x    ; motor on
             lda  #CODE_Y
             sta  RUNNING
-            jsr  resetscreen
 noslotchange
             printmessage M_MESSAGE_OK
             rts
@@ -1099,7 +1093,10 @@ prevtrackdrive2
             lda  DRV2TRK,y
 endprevtrack
             lsr
-            sta  DISK_TRACK
+            cmp  #34 + 1      ; highest allowed track
+            bmi  settrackok
+            lda  #0
+settrackok  sta  DISK_TRACK
             rts
 
 maybefixtrack
