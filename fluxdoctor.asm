@@ -810,7 +810,9 @@ trackok     sta  DISK_TRACK
             asl
             sta  DISK_SLOT
             ldx  DISK_SLOT    ; restore X
-            lda  DRV0EN,x
+            lda  #1
+            sta  DISK_DRIVE
+            lda  DRV0EN,x     ; drive 1
             lda  MOTORON,x    ; motor on
             lda  #CODE_Y
             sta  RUNNING
