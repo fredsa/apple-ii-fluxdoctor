@@ -264,50 +264,16 @@ text_row_17 equ  $7d0
 
             mac  printmessage
 .addr       equ  {1}
-            lda  .addr
-            sta  CV
-            jsr  VTAB
-            lda  .addr+1
-            sta  CH
-            lda  #>(.addr-256+2) ; reset high byte
-            sta  .noinc+2
-            ldy  #$ff
-.next       iny
-            bne  .noinc
-            inc  .noinc+2       ; increment high byte
-.noinc      lda  .addr-256+2,y
-            beq  .done
-            bpl  .notinv        ; ORA #$80 chars = invert
-            and  #$3f
-            jmp  .cout
-.notinv     ora  #$80
-.cout       jsr  COUT
-            jmp  .next
-.done
+            ldx  <#.addr
+            lda  >#.addr
+            jsr  printmsg
             endm
 
             mac  printmessageinv
 .addr       equ  {1}
-            lda  .addr
-            sta  CV
-            jsr  VTAB
-            lda  .addr+1
-            sta  CH
-            lda  #>(.addr-256+2) ; reset high byte
-            sta  .noinc+2
-            ldy  #$ff
-.next       iny
-            bne  .noinc
-            inc  .noinc+2       ; increment high byte
-.noinc      lda  .addr-256+2,y
-            beq  .done
-            bpl  .notinv        ; ORA #$80 chars = invert
-            ora  #$80
-            jmp .cout
-.notinv     and  #$3f
-.cout       jsr  COUT
-            jmp  .next
-.done
+            ldx  <#.addr
+            lda  >#.addr
+            jsr  printmsginv
             endm
 
             mac  readbyte
@@ -917,6 +883,36 @@ printmsgcout
             jmp  printmsgloop
 printmsgend rts
 
+
+printmsginv
+            stx  PTRL
+            sta  PTRH
+            ldy  #0
+            lda  (PTRL),y
+            sta  CV
+            jsr  VTAB
+            iny
+            lda  (PTRL),y
+            sta  CH
+            clc
+            iny
+printinvloop
+            lda  (PTRL),y ; get char
+            beq  printinvend
+            bpl  printinvnotinv  ; ORA #$80 chars = invert
+            ora  #$80
+            jmp  printinvcout
+printinvnotinv
+            and  #$3f
+printinvcout
+            jsr  COUT
+            inc  PTRL
+            bne  printinvloop
+            inc  PTRH
+            jmp  printinvloop
+printinvend rts
+
+
 help
             lda  #00
             sta  HELP_SCREEN
@@ -950,6 +946,7 @@ nothelp4
             bne  nothelp5
             printmessage M_KEYBOARD_SHORTCUTS
 nothelp5
+
 
 helpfooter  printmessage M_HELP_FLUXDOCTOR
             printmessage M_HELP_NAVIGATION
@@ -994,6 +991,7 @@ errorcodereference
             sta  ERR_CODE_EPILOGUE_ADDR
             rts
 
+
 fullresetscreen
             jsr HOME
             jsr errorcodereference
@@ -1035,6 +1033,7 @@ endclearsect
             sta  DRIVE_ADDR
             rts
 
+
 touchsect   and  #$0f         ; TODO report bad sector > $0f
             tax
             tay
@@ -1052,6 +1051,7 @@ endtouchsect
             sta  touchsect_addr,x
             rts
 
+
 ; printnibble
 ;             stx  SAVEX
 ;             pha
@@ -1062,6 +1062,7 @@ endtouchsect
 ;             pla
 ;             ldx  SAVEX
 ;             rts
+
 
 ; printhex
 ;             stx  SAVEX
@@ -1084,6 +1085,7 @@ endtouchsect
 ;             ldx  SAVEX
 ;             rts
 
+
 showfound
             renderhex FOUND_VOLUME,VOLUME_ADDR
             renderhex FOUND_TRACK,TRACK_ADDR
@@ -1093,6 +1095,7 @@ showfound
             jsr  touchsect
             rts
 
+
 renderdatachecksumok
             lda  #'_ | $80
             sta  DATA_CHECKSUM_ADDR+0
@@ -1100,11 +1103,13 @@ renderdatachecksumok
             sta  DATA_CHECKSUM_ADDR+2
             rts
 
+
 renderdatachecksumbad
             renderhex DATA_CHECKSUM,DATA_CHECKSUM_ADDR
             lda  #'!
             sta  DATA_CHECKSUM_ADDR+2
             rts
+
 
 ; --------------------------------------------------
 ; Disk II
