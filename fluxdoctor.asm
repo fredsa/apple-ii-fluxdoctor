@@ -4,7 +4,7 @@
 ; See LICENSE.txt
 ;
 ; Diagnostic utility for real-time troubleshooting,
-; calibration, and repair of Apple II floppy drives.
+; calibration, and repair of Disk II floppy drives.
 ; --------------------------------------------------
             processor 6502
             org  1
@@ -1282,7 +1282,7 @@ M_HELP0
             byte "ISOLATES INTERMITTENT ELECTROMECHANICAL",13
             byte "FAULTS. IDENTIFIES LOW QUALITY DISKS.",13
             byte 13
-            byte "DIRECT KEY COMMANDS PROVIDE OPERATOR",13
+            byte "KEY COMMANDS PROVIDE OPERATOR DIRECT",13
             byte "CONTROL OF STEPPER AND SPINDLE MOTORS.",13
             byte 13
             byte "CONTINUOUS TRACK SAMPLING EASES TEDIOUS",13
@@ -1291,11 +1291,14 @@ M_HELP0
             byte "DYNAMIC DISPLAY INDICATES SECTORS READ",13
             byte "AND SOFT ERRORS NORMALLY MASKED BY DOS.",13
             byte 13
-            byte "AUTOSTART ENABLES BENCH TESTING WITHOUT",13
+            byte "AUTOSTART ALLOWS BENCH TESTING WITHOUT",13
             byte "AN OPERATIONAL KEYBOARD.",13
             byte 13
             byte "CASSETTE LOADING PERMITS SERVICING WHEN",13
-            byte "DISKETTE BOOTSTRAP IS INOPERATIVE.",0
+            byte "DISKETTE BOOTSTRAP IS INOPERATIVE.",13
+            byte 13
+            byte "FORMAT AND WRITE DISKS OUT OF THIN AIR,",13
+            byte "THANKS TO INSTA-DISK.",0
 
 M_HELP1
             byte $00,$0b ; ypos, xpos
@@ -1304,21 +1307,21 @@ M_HELP1
             byte "IN A PROPERLY ALIGNED DRIVE, ALL 16",13
             byte "SECTORS OF A TRACK ARE READ DURING EACH",13
             byte "ROTATION. AT 300 RPM (200 MS/REV), THE",13
-            byte "SECTOR MAP UPDATES FIVE TIMES A SECOND.",13
+            byte "TRACK VIEW UPDATES FIVE TIMES A SECOND.",13
             byte 13
             byte "DOS 3.3 INTERLEAVED DISKETTES PRODUCE A",13
             byte "PROGRESSIVE SWEEP FROM LEFT TO RIGHT.",13
             byte 13
             byte "READ ERRORS WILL DISRUPT THE SEQUENCE.",13
-            byte "PRESS ",KBD_RESEEK|$80," TO REINITIALIZE THE SECTOR MAP",13
+            byte "PRESS ",KBD_RESEEK|$80," TO REINITIALIZE THE TRACK VIEW",13
             byte "AND CLEAR ALL ERROR FLAGS.",13
             byte 13
             byte "NOTE, PASCAL/PRODOS INTERLEAVED MEDIA",13
             byte "WILL NOT PRODUCE A SWEEP PATTERN DUE",13
             byte "TO LOGICAL SECTOR SKEW DIFFERENCES.",13
             byte 13
-            byte "WRITE PROTECT SENSOR IS QUERIED ON EACH",13
-            byte "SEEK STEP. PRESS ",KBD_RESEEK|$80," TO RESAMPLE STATUS.",0
+            byte "WRITE PROTECT SENSOR IS QUERIED DURING",13
+            byte "SEEK. PRESS ",KBD_RESEEK|$80," TO REFRESH STATUS.",0
 
 M_HELP2
             byte $00,$0b ; ypos, xpos
