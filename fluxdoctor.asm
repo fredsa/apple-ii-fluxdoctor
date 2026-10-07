@@ -1099,23 +1099,23 @@ doseek
             jsr  resetscreen
             printmessage M_MESSAGE_OK
 
-            lda DISK_DRIVE   ; get desired track
-            ror
-            ror
-            sta DRIVNO       ; set desired disk (neg=1, pos=2)
-            lda DISK_TRACK   ; set desired track
-            ldx DISK_SLOT    ; set desired slot
-            jsr myseek
-
-            ldx  DISK_SLOT    ; restore X
-            lda  MOTORON,x    ; keep motor on
             lda  RUNNING
             cmp  #CODE_Y
             beq  seek_nospinup
+            ldx  DISK_SLOT    ; restore X
+            lda  MOTORON,x    ; ensure motor on
             jsr  motorspinup
-seek_nospinup
             lda  #CODE_Y
             sta  RUNNING
+seek_nospinup
+            lda  DISK_DRIVE   ; get desired track
+            ror
+            ror
+            sta  DRIVNO       ; set desired disk (neg=1, pos=2)
+            lda  DISK_TRACK   ; set desired track
+            ldx  DISK_SLOT    ; set desired slot
+            jsr  myseek
+
             renderhex DISK_TRACK,TARGET_TRACK_ADDR
             jsr  showwp
             rts
