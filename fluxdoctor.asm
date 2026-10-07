@@ -1104,8 +1104,8 @@ doseek
             ror
             sta DRIVNO       ; set desired disk (neg=1, pos=2)
             lda DISK_TRACK   ; set desired track
-            ldx  DISK_SLOT   ; set desired slot
-            jsr MYSEEK
+            ldx DISK_SLOT    ; set desired slot
+            jsr myseek
 
             ldx  DISK_SLOT    ; restore X
             lda  MOTORON,x    ; keep motor on
@@ -1467,7 +1467,7 @@ dos33_6and2
 ; X = slot << 4
 ; A = dest track
 ; DRIVNO = negative: drive 1, positive: drive 2
-MYSEEK      asl               ; 2x track
+myseek      asl               ; 2x track
             jsr  myseek2
             lsr  CURTRK       ; DIVIDE BACK DOWN
             rts
