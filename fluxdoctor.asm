@@ -399,7 +399,7 @@ prepmap2    lda  dos33_6and2,y
             jmp  initseek
 initdrive0
             LDA  DRV0EN,x
-initseek    jsr  seek
+initseek    jsr  doseek
 
             lda  Q7L,x        ; read mode
 
@@ -652,7 +652,7 @@ nokeycase
             cmp  #0           ; lowest track
             beq  noleft
             dec  DISK_TRACK
-            jsr  seek
+            jsr  doseek
             jmp  nokey
 noleft
 
@@ -662,7 +662,7 @@ noleft
             cmp  #34          ; highest track
             beq  noright
             inc  DISK_TRACK
-            jsr  seek
+            jsr  doseek
             jmp  nokey
 noright
 
@@ -673,7 +673,7 @@ noright
             beq  nozero
             lda  #0
             sta  DISK_TRACK
-            jsr  seek
+            jsr  doseek
             jmp  nokey
 nozero
 
@@ -684,7 +684,7 @@ nozero
             beq  nofour
             lda  #34
             sta  DISK_TRACK
-            jsr  seek
+            jsr  doseek
             jmp  nokey
 nofour
 
@@ -1083,7 +1083,7 @@ spinup_loop lda  #0
 ; --------------------------------------------------
 ; Disk II
 ; --------------------------------------------------
-seek
+doseek
             jsr  resetscreen
             printmessage M_MESSAGE_OK
 
@@ -1167,7 +1167,7 @@ maybefixdrivetrack2
             rol
             sta  DRV2TRK,y
 fixtrackseek
-            jsr  seek
+            jsr  doseek
 endfixtrack
             rts
 
