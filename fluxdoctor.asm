@@ -283,10 +283,12 @@ text_row_17 equ  $7d0
 ; --------------------------------------------------
 pgmstart
             ; --------------------------------------------------
-            ; Clear exit flag
+            ; Clear exit flag and running state
             ; --------------------------------------------------
             lda  #$00
             sta  EXIT_FLAG
+            lda  #CODE_N
+            sta  RUNNING
 
             ; --------------------------------------------------
             ; Clear screen
@@ -718,6 +720,7 @@ noesc
             bne  nomotoron
             ldx  DISK_SLOT    ; restore X
             lda  MOTORON,x    ; motor on
+            jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
             jmp  nokey
@@ -745,6 +748,7 @@ nomotoroff
             ldx  DISK_SLOT    ; restore X
             lda  DRV0EN,x
             lda  MOTORON,x    ; motor on
+            jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
             jmp  nokey
@@ -763,6 +767,7 @@ nodrive1
             ldx  DISK_SLOT    ; restore X
             lda  DRV1EN,x
             lda  MOTORON,x    ; motor on
+            jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
             jmp  nokey
@@ -811,6 +816,7 @@ askslotdrive2
             lda  DRV1EN,x     ; drive 2
 askslotmotoron
             lda  MOTORON,x    ; motor on
+            jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
 noslotchange
@@ -1056,6 +1062,24 @@ renderdatachecksumbad
 
 
 ; --------------------------------------------------
+; Motor spin-up delay (~0.5s)
+; --------------------------------------------------
+motorspinup
+            pha
+            txa
+            pha
+            ldx  #3
+spinup_loop lda  #0
+            jsr  WAIT
+            dex
+            bne  spinup_loop
+            pla
+            tax
+            pla
+            rts
+
+
+; --------------------------------------------------
 ; Disk II
 ; --------------------------------------------------
 seek
@@ -1072,6 +1096,11 @@ seek
 
             ldx  DISK_SLOT    ; restore X
             lda  MOTORON,x    ; keep motor on
+            lda  RUNNING
+            cmp  #CODE_Y
+            beq  seek_nospinup
+            jsr  motorspinup
+seek_nospinup
             lda  #CODE_Y
             sta  RUNNING
             renderhex DISK_TRACK,TARGET_TRACK_ADDR
