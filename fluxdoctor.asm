@@ -898,8 +898,6 @@ helploop    jsr  HOME
             lda  HELP_SCREEN
             asl
             tay
-            lda  PTRL
-            lda  PTRH
             lda  (PTRL),y
             tax
             iny
