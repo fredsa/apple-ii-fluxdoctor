@@ -33,10 +33,21 @@ GITHUB_URL eqm "GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR"
 
 
 ; --------------------------------------------------
-; ROM address use
+; BASIC ROM address use
 ; --------------------------------------------------
 CH          equ  $24
 CV          equ  $25
+
+; --------------------------------------------------
+; DOS ROM address use
+; --------------------------------------------------
+TRKCNT      equ $26 ; HALFTRKS MOVED COUNT.
+PRIOR       equ $27 ; PRIOR HALFTRACK.
+TRKN        equ $2A ; DESIRED TRACK.
+SLOTTEMP    equ $2B ; SLOT NUM TIMES $10.
+
+MONTIMEL    equ $46 ; MOTOR-ON TIME
+MONTIMEH    equ $47 ; COUNTERS.
 
 
 ; --------------------------------------------------
@@ -1452,182 +1463,110 @@ dos33_6and2
             byte $ED, $EE, $EF, $F2, $F3, $F4, $F5, $F6 ; 6-bit values $30 - $37
             byte $F7, $F9, $FA, $FB, $FC, $FD, $FE, $FF ; 6-bit values $38 - $3f
 
-; --------------------------------------------------
-; MSWAIT
-; --------------------------------------------------
-;MONTIME     EQU $46
-MONTIMEL    EQU $46 ; MOTOR-ON TIME
-MONTIMEH    EQU $47 ; COUNTERS.
-
-; --------------------------------------------------
-; SEEK
-; --------------------------------------------------
-TRKCNT      EQU $26 ; HALFTRKS MOVED COUNT.
-PRIOR       EQU $27 ; PRIOR HALFTRACK.
-TRKN        EQU $2A ; DESIRED TRACK.
-SLOTTEMP    EQU $2B ; SLOT NUM TIMES $10.
-
-
-
-; *
-; * THIS IS THE 'SEEK' ROUTINE
-; * SEEKS TRACK 'N' IN SLOT #X/$10
-; * IF DRIVNO IS NEGATIVE, ON DRIVE 1
-; * IF DRIVNO IS POSITIVE, ON DRIVE 2
-; *
 
 ; X = slot << 4
 ; A = dest track
 ; DRIVNO = negative: drive 1, positive: drive 2
-MYSEEK      ASL               ; 2x track
-            JSR  MYSEEK2
-            LSR  CURTRK       ; DIVIDE BACK DOWN
-            RTS
-MYSEEK2     STA  TRKN         ; SAVE DESTINATION TRACK(*2)
-            JSR  XTOY         ; SET Y=SLOT#
-            LDA  DRV1TRK,Y
-            BIT  DRIVNO
-            BMI  WASD0        ; IS MINUS, ON DRIVE ZERO
-            LDA  DRV2TRK,Y
-WASD0       STA  CURTRK       ; THIS IS WHERE I AM
-            LDA  TRKN         ; AND WHERE I'M GOING TO
-            BIT  DRIVNO       ; NOW UPDATE SLOT DEPENDENT
-            BMI  ISDRV1       ; LOCATIONS WITH TRACK
-            STA  DRV2TRK,Y    ; INFORMATION
-            BPL  GOSEEK       ; ALWAYS TAKEN
-ISDRV1      STA  DRV1TRK,Y
-GOSEEK      JMP  SEEK         ; GO THERE!
-XTOY        TXA
-            LSR
-            LSR
-            LSR
-            LSR
-            TAY
-            RTS
+MYSEEK      asl               ; 2x track
+            jsr  myseek2
+            lsr  CURTRK       ; DIVIDE BACK DOWN
+            rts
+myseek2     sta  TRKN         ; SAVE DESTINATION TRACK(*2)
+            jsr  XTOY         ; SET Y=SLOT#
+            lda  DRV1TRK,y
+            bit  DRIVNO
+            bmi  WASD0        ; IS MINUS, ON DRIVE ZERO
+            lda  DRV2TRK,y
+WASD0       sta  CURTRK       ; THIS IS WHERE I AM
+            lda  TRKN         ; AND WHERE I'M GOING TO
+            bit  DRIVNO       ; NOW UPDATE SLOT DEPENDENT
+            bmi  ISDRV1       ; LOCATIONS WITH TRACK
+            sta  DRV2TRK,y    ; INFORMATION
+            bpl  GOSEEK       ; ALWAYS TAKEN
+ISDRV1      sta  DRV1TRK,y
+GOSEEK      jmp  fastseek     ; GO THERE!
+XTOY        txa
+            lsr
+            lsr
+            lsr
+            lsr
+            tay
+            rts
 
 ; --------------------------------------------------
 ; MSWAIT
 ; --------------------------------------------------
-MSWAIT      LDX  #$11
-MSW1        DEX               ; DELAY 86 USEC.
-            BNE  MSW1
-            INC  MONTIMEL
-            BNE  MSW2         ; DOUBLE-BYTE
-            INC  MONTIMEH     ; INCREMENT.
-MSW2        SEC
-            SBC  #$1          ; DONE 'N' INTERVALS?
-            BNE  MSWAIT       ; (A-REG COUNTS)
-            RTS
+MSWAIT      ldx  #$11
+MSW1        dex               ; DELAY 86 USEC.
+            bne  MSW1
+            inc  MONTIMEL
+            bne  MSW2         ; DOUBLE-BYTE
+            inc  MONTIMEH     ; INCREMENT.
+MSW2        sec
+            sbc  #$1          ; DONE 'N' INTERVALS?
+            bne  MSWAIT       ; (A-REG COUNTS)
+            rts
 
 
-; **************************
-; *                        *
-; * FAST SEEK SUBROUTINE   *
-; *                        *
-; **************************
-; *                        *
-; * ---- ON ENTRY ----     *
-; *                        *
-; * X-REG HOLDS SLOTNUM    *
-; * TIMES $10.             *
-; *                        *
-; * A-REG HOLDS DESIRED    *
-; * HALFTRACK.             *
-; * (SINGLE PHASE)         *
-; *                        *
-; * CURTRK HOLDS CURRENT   *
-; * HALFTRACK.             *
-; *                        *
-; * ---- ON EXIT -----     *
-; *                        *
-; * A-REG UNCERTAIN.       *
-; * Y-REG UNCERTAIN.       *
-; * X-REG UNDISTURBED.     *
-; *                        *
-; * CURTRK AND TRKN HOLD   *
-; * FINAL HALFTRACK.       *
-; *                        *
-; * PRIOR HOLDS PRIOR      *
-; * HALFTRACK IF SEEK      *
-; * WAS REQUIRED.          *
-; *                        *
-; * MONTIMEL AND MONTIMEH  *
-; * ARE INCREMENTED BY     *
-; * THE NUMBER OF          *
-; * 100 USEC QUANTUMS      *
-; * REQUIRED BY SEEK       *
-; * FOR MOTOR ON TIME      *
-; * OVERLAP.               *
-; *                        *
-; * --- VARIABLES USED --- *
-; *                        *
-; * CURTRK, TRKN, COUNT,   *
-; * PRIOR, SLOTTEMP        *
-; * MONTIMEL, MONTIMEH     *
-; *                        *
-; **************************
 ; --------------------------------------------------
-; SEEK
+; Fast seek
 ; --------------------------------------------------
-SEEK        STX  SLOTTEMP     ; SAVE X-REG
-            STA  TRKN         ; SAVE TARGET TRACK
-            CMP  CURTRK       ; ON DESIRED TRACK?
-            BEQ  SEEKRTS      ; YES, RETURN
-            LDA  #$0
-            STA  TRKCNT       ; HALFTRACK COUNT.
-SEEK2       LDA  CURTRK       ; SAVE CURTRK FOR
-            STA  PRIOR        ; DELAYED TURNOFF.
-            SEC
-            SBC  TRKN         ; DELTA-TRACKS.
-            BEQ  SEEKEND      ; BR IF CURTRK=DESTINATION
-            BCS  OUT          ; (MOVE OUT, NOT IN)
-            EOR  #$FF         ; CALC TRKS TO GO.
-            INC  CURTRK       ; INCR CURRENT TRACK (IN).
-            BCC  MINTST       ; (ALWAYS TAKEN)
-OUT         ADC  #$FE         ; CALC TRKS TO GO.
-            DEC  CURTRK       ; DECR CURRENT TRACK (OUT).
-MINTST      CMP  TRKCNT
-            BCC  MAXTST       ; AND 'TRKS MOVED'.
-            LDA  TRKCNT
-MAXTST      CMP  #$C
-            BCS  STEP2        ; IF TRKCNT>$B LEAVE Y ALONE (Y=$B).
-STEP        TAY               ; ELSE SET ACCELERATION INDEX IN Y
-STEP2
-            SEC               ; CARRY SET=PHASE ON
-            JSR  SETPHASE     ; PHASE ON
-            LDA  ONTABLE,Y    ; FOR 'ONTIME'.
-            JSR  MSWAIT       ; (100 USEC INTERVALS)
-            LDA  PRIOR
-            CLC               ; CARRY CLEAR=PHASE OFF
-            JSR  CLRPHASE     ; PHASE OFF
-            LDA  OFFTABLE,Y   ; THEN WAIT 'OFFTIME'.
-            JSR  MSWAIT       ; (100 USEC INTERVALS)
-            INC  TRKCNT       ; 'TRACKS MOVED' COUNT.
-            BNE  SEEK2        ; (ALWAYS TAKEN)
-; *
-SEEKEND                       ; END OF SEEKING
-            JSR  MSWAIT       ; A=0: WAIT 25 MS SETTLE
-            CLC               ; AND TURN OFF PHASE
+fastseek    stx  SLOTTEMP     ; SAVE X-REG
+            sta  TRKN         ; SAVE TARGET TRACK
+            cmp  CURTRK       ; ON DESIRED TRACK?
+            beq  fastseekend  ; YES, RETURN
+            lda  #$0
+            sta  TRKCNT       ; HALFTRACK COUNT.
+fastseek2   lda  CURTRK       ; SAVE CURTRK FOR
+            sta  PRIOR        ; DELAYED TURNOFF.
+            sec
+            sbc  TRKN         ; DELTA-TRACKS.
+            beq  seekend      ; BR IF CURTRK=DESTINATION
+            bcs  seekout      ; (MOVE OUT, NOT IN)
+            eor  #$FF         ; CALC TRKS TO GO.
+            inc  CURTRK       ; INCR CURRENT TRACK (IN).
+            bcc  MINTST       ; (ALWAYS TAKEN)
+seekout     adc  #$FE         ; CALC TRKS TO GO.
+            dec  CURTRK       ; DECR CURRENT TRACK (OUT).
+MINTST      cmp  TRKCNT
+            bcc  MAXTST       ; AND 'TRKS MOVED'.
+            lda  TRKCNT
+MAXTST      cmp  #$C
+            bcs  seekstep2    ; IF TRKCNT>$B LEAVE Y ALONE (Y=$B).
+            tay               ; ELSE SET ACCELERATION INDEX IN Y
+seekstep2   sec               ; CARRY SET=PHASE ON
+            jsr  setphase     ; PHASE ON
+            lda  phaseon,y    ; FOR 'ONTIME'.
+            jsr  MSWAIT       ; (100 USEC INTERVALS)
+            lda  PRIOR
+            clc               ; CARRY CLEAR=PHASE OFF
+            jsr  clrphase     ; PHASE OFF
+            lda  phaseoff,y   ; THEN WAIT 'OFFTIME'.
+            jsr  MSWAIT       ; (100 USEC INTERVALS)
+            inc  TRKCNT       ; 'TRACKS MOVED' COUNT.
+            bne  fastseek2    ; (ALWAYS TAKEN)
+
+seekend                       ; END OF SEEKING
+            jsr  MSWAIT       ; A=0: WAIT 25 MS SETTLE
+            clc               ; AND TURN OFF PHASE
 
 ; *
 ; * TURN HEAD STEPPER PHASE ON/OFF
 ; *
-SETPHASE
-            LDA  CURTRK       ; GET CURRENT PHASE
-CLRPHASE
-            AND  #3           ; MASK FOR 1 OF 4 PHASES
-            ROL               ; DOUBLE FOR PHASE INDEX
-            ORA  SLOTTEMP
-            TAX
-            LDA  PHASEOFF,X   ; FLIP THE PHASE
-            LDX  SLOTTEMP     ; RESTORE X-REG
-SEEKRTS     RTS
+setphase    lda  CURTRK       ; GET CURRENT PHASE
+clrphase    and  #3           ; MASK FOR 1 OF 4 PHASES
+            rol               ; DOUBLE FOR PHASE INDEX
+            ora  SLOTTEMP
+            tax
+            lda  PHASEOFF,x   ; FLIP THE PHASE
+            ldx  SLOTTEMP     ; RESTORE X-REG
+fastseekend rts
 
-ONTABLE     byte 1,$30,$28
+phaseon     byte 1,$30,$28
             byte $24,$20,$1E
             byte $1D,$1C,$1C
             byte $1C,$1C,$1C
-OFFTABLE    byte $70,$2C,$26
+phaseoff    byte $70,$2C,$26
             byte $22,$1F,$1E
             byte $1D,$1C,$1C
             byte $1C,$1C,$1C
