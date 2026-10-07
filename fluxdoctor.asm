@@ -819,6 +819,7 @@ askslotmotoron
             jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
+            lda  Q7L,x        ; ensure read mode
 noslotchange
             printmessage M_MESSAGE_OK
             rts
