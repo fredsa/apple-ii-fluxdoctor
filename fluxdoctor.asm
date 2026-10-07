@@ -49,6 +49,7 @@ RUNNING     equ  $08
 HELP_SCREEN equ $09
 
 ; $1D-$1E - Free Space
+DRIVNO      equ  $1D
 
 ; $CE-$CF - Free Space
 
@@ -105,7 +106,6 @@ CROUT       equ  $FD8E
 ; --------------------------------------------------
 ; DOS data
 ; --------------------------------------------------
-DRIVNO      equ  $35
 CURTRK      EQU  $478 ; CURRENT TRACK ON ENTRY.
 DRV1TRK     equ  $478
 ;                $479 (DRV1TRK),1 = Slot 1 half-track
