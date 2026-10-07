@@ -508,7 +508,7 @@ loopreadhdr sta  CALC_CHKSUM
 noheadererr
             lda  #ERR_CODE_MISSING
             sta  ADDR_FIELD_ERR_ADDR_M
-            jmp  readdatafield
+            jmp  enddataerr
 
 addrchecksumerr
             lda  #ERR_CODE_CHECKSUM
