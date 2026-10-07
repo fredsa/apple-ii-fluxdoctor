@@ -936,10 +936,9 @@ nohelpkey   lda  KBD
 nohelpprev
             lda  HELP_SCREEN
             cmp  HELP_SCREEN_COUNT
-            beq  helpend
+            beq  nohelpkey
             inc  HELP_SCREEN
             jmp  helploop
-            jmp  nohelpkey
 
 helpend     jsr  fullresetscreen
             rts
