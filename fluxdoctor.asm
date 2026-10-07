@@ -887,7 +887,7 @@ printinvend rts
 
 
 help
-            lda  #00
+            lda  #01
             sta  HELP_SCREEN
 
 helploop    jsr  HOME
@@ -896,6 +896,8 @@ helploop    jsr  HOME
             lda  >#M_HELP_PTRS
             sta  PTRH
             lda  HELP_SCREEN
+            sec
+            sbc  #1
             asl
             tay
             lda  (PTRL),y
@@ -908,7 +910,7 @@ helpprintmsg
             jsr  printmsg
 
             lda  HELP_SCREEN
-            cmp  #5
+            cmp  #6
             bne  nothelp5
             printmessage M_KEYBOARD_SHORTCUTS
 nothelp5
@@ -927,6 +929,7 @@ nohelpkey   lda  KBD
             cmp  #KBD_LEFT
             bne  nohelpprev
             lda  HELP_SCREEN
+            cmp  #1
             beq  nohelpkey
             dec  HELP_SCREEN
             jmp  helploop
@@ -1255,7 +1258,7 @@ M_HELP_PAGE_NO equ text_row_17+0
 M_HELP_PAGE_OF equ text_row_17+3
 
 
-HELP_SCREEN_COUNT byte 7
+HELP_SCREEN_COUNT byte 8
 M_HELP_PTRS
             word M_HELP0,M_HELP1,M_HELP2,M_HELP3
             word M_HELP4,M_HELP5,M_HELP6,M_HELP7
