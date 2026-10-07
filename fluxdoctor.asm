@@ -718,6 +718,7 @@ nos
 noesc
             cmp  #'N
             bne  nomotoron
+            jsr  resetscreen
             ldx  DISK_SLOT    ; restore X
             lda  MOTORON,x    ; motor on
             jsr  motorspinup
