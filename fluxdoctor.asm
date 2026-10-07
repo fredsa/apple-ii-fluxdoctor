@@ -1125,7 +1125,7 @@ prevtrackdrive2
 endprevtrack
             lsr
             cmp  #34 + 1      ; highest allowed track
-            bmi  settrackok
+            bcc  settrackok
             lda  #0
 settrackok  sta  DISK_TRACK
             rts
