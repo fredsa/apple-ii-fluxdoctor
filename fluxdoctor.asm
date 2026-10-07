@@ -690,6 +690,8 @@ nofour
             bne noh
             ldx  DISK_SLOT    ; restore X
             lda  MOTOROFF,x   ; motor off
+            lda  #CODE_N
+            sta  RUNNING
             jsr help
             jmp  nokey
 noh
