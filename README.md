@@ -13,9 +13,10 @@ Apple II floppy disks drives. Runs natively on Apple II computer hardware.
 
 Available in multiple formats from the
 [Releases](https://github.com/fredsa/apple-ii-fluxdoctor/releases) page:
-- Autostart (140kB) DOS 3.3 floppy disk image (`*.DO`)
-- Autostart cassette tape audio file (`*.WAV`)
-- Machine language monitor type-in listing (`*.MON`)
+- DISK: (140kB) DOS 3.3 floppy disk image (`*.DO`)
+- TAPE: Cassette tape audio file (`*.WAV`)
+- TYPE-IN: Machine language monitor type-in listing (`*.MON`)
+- INSTA_DISK: self-writing disk audio file (`*.WAV`)
 
 <img width="50%" height="50%" src="fluxdoctor.png">
 
@@ -67,11 +68,11 @@ To make a physical FLUXDOCTOR floppy disk, you have a few options:
 
 Purchase a [Greaseweazle](https://github.com/keirf/greaseweazle). Use the `gw`
 command to write the 35-track 140kB `fluxdoctor.do` DOS 3.3 floppy disk image
-using any PC or Shutgart 5.25" floppy drive to a double density floppy diskL
+using any PC or Shutgart 5.25" floppy drive to a double density floppy disk.
 
 ```
-# Specify `--tracks=step=2` if your using a 96TPI drive.
-gw write --tracks=step=2 fluxdoctor-*.do
+gw write out/fluxdoctor-1.3.do --tracks=step=2    # 96 TPI floppy drive
+gw write out/fluxdoctor-1.3.do                    # 48 TPI floppy drive
 ```
 
 ## ADTPro
@@ -82,21 +83,15 @@ Apple II.
 
 ## c2t
 
-Use [c2t](https://github.com/datajerk/c2t), the same tool that powers
-https://asciiexpress.net/ to create a WAV file you can just send to your
-Apple II using an audio cable. Works even if you don't (yet) have a bootable
-floppy disk.
+Thanks to [c2t](https://github.com/datajerk/c2t), the same tool that powers
+https://asciiexpress.net/, you can write a new FLUXDOCTOR disk, even if you
+don't (yet) have a bootable floppy disk.
 
-To compile `c2t.exe` on Windows, install the
-[MSYS2](https://www.msys2.org/docs/environments/) `UCRT64` environment.
-
-Use `c2t` to create the WAV file which you can stream to your Apple II cassette
-port:
-
-```
-cp fluxdoctor.do fluxdoctor.dsk
-c2t fluxdoctor.dsk fluxdoctor.wav
-```
+Simply:
+1. Connect your phone or laptop via an audio cable to the Apple II tape in port.
+2. Insert a blank disk into drive 1 (slot 6)
+3. Type `LOAD` on the Apple II
+4. Play the audio file: `fluxdoctor-insta-disk-1.3.wav`
 
 
 # Testing
