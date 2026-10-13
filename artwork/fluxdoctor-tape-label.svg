@@ -25,14 +25,14 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="2.3039717"
-     inkscape:cx="201.82539"
-     inkscape:cy="238.93522"
+     inkscape:cx="201.8254"
+     inkscape:cy="238.93523"
      inkscape:window-width="1728"
      inkscape:window-height="1056"
      inkscape:window-x="0"
      inkscape:window-y="33"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1"
+     inkscape:current-layer="g17"
      showgrid="false" /><defs
      id="defs1"><inkscape:path-effect
        effect="fillet_chamfer"
@@ -353,7 +353,7 @@
        inkscape:label="front-url"><tspan
          x="311.71875"
          y="590.3125"
-         id="tspan8">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><text
+         id="tspan1">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,0.70380236,-51.575988)"
        id="text4-2"
@@ -363,7 +363,7 @@
        y="0"><tspan
          x="311.71875"
          y="799.6875"
-         id="tspan9">VERSION 1.3</tspan></text><text
+         id="tspan2">VERSION 1.4</tspan></text><text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,29.439206,-20.303881)"
        id="text4-2-7"
@@ -373,7 +373,7 @@
        y="0"><tspan
          x="311.71875"
          y="799.6875"
-         id="tspan10">SERIAL 26090042</tspan></text><image
+         id="tspan3">SERIAL 26090042</tspan></text><image
        width="51.099266"
        height="8.1957502"
        preserveAspectRatio="none"
@@ -400,21 +400,21 @@
        inkscape:label="description text"><tspan
          x="236.78125"
          y="696.78338"
-         id="tspan14"><tspan
+         id="tspan5"><tspan
            style="font-weight:bold;font-family:Arial;-inkscape-font-specification:Arial;text-align:start"
-           id="tspan13">Diagnostic utility for real-time troubleshooting,
+           id="tspan4">Diagnostic utility for real-time troubleshooting,
 </tspan></tspan><tspan
          x="236.78125"
          y="705.1939"
-         id="tspan16"><tspan
+         id="tspan7"><tspan
            style="font-weight:bold;font-family:Arial;-inkscape-font-specification:Arial;text-align:start"
-           id="tspan15">calibration, and repair of Apple II floppy drives.
+           id="tspan6">calibration, and repair of Apple II floppy drives.
 </tspan></tspan><tspan
          x="236.78125"
          y="713.60442"
-         id="tspan18"><tspan
+         id="tspan9"><tspan
            style="font-weight:bold;text-align:start"
-           id="tspan17">
+           id="tspan8">
 </tspan></tspan></text></g><path
      style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:non-scaling-stroke;fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;stroke-opacity:1;-inkscape-stroke:hairline;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
      d="m 21.144185,34.10626 -3.929476,3.93723 V 75.84067 H 105.94884 V 38.04349 l -3.92948,-3.93723 z"
