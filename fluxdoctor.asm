@@ -1,5 +1,5 @@
 ; --------------------------------------------------
-; FLUXDOCTOR V1.3
+; FLUXDOCTOR V1.4
 ; Copyright Fred Sauer 2026
 ; See LICENSE.txt
 ;
@@ -1212,7 +1212,7 @@ WRITE_PROTECT_ADDR equ text_row_00+33
 
 M_VERSION
             byte $00,$24 ; ypos, xpos
-            byte "V1.3",0
+            byte "V1.4",0
 
 M_TARGET_TRACK
             byte $01,$00 ; ypos, xpos

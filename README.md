@@ -1,4 +1,4 @@
-# **`FLUXDOCTOR`** V1.3 for Apple II computers
+# **`FLUXDOCTOR`** V1.4 for Apple II computers
 
 Diagnostic utility for real-time troubleshooting, calibration, and repair of
 Apple II floppy disks drives. Runs natively on Apple II computers hardware.
@@ -66,8 +66,8 @@ command to write the 35-track 140kB `fluxdoctor.do` DOS 3.3 floppy disk image
 using any PC or Shutgart 5.25" floppy drive to a double density floppy disk.
 
 ```
-gw write out/fluxdoctor-1.3.do --tracks=step=2    # 96 TPI floppy drive
-gw write out/fluxdoctor-1.3.do                    # 48 TPI floppy drive
+gw write out/fluxdoctor-1.4.do --tracks=step=2    # 96 TPI floppy drive
+gw write out/fluxdoctor-1.4.do                    # 48 TPI floppy drive
 ```
 
 ## ADTPro
@@ -86,7 +86,7 @@ Simply:
 1. Connect your phone or laptop via an audio cable to the Apple II tape in port.
 2. Insert a blank disk into drive 1 (slot 6)
 3. Type `LOAD` on the Apple II
-4. Play the audio file: `fluxdoctor-insta-disk-1.3.wav`
+4. Play the audio file: `fluxdoctor-insta-disk-1.4.wav`
 
 
 # Testing

@@ -7,7 +7,7 @@
    viewBox="0 0 215.9 279.4"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
    sodipodi:docname="fluxdoctor-tape-card.svg"
    xml:space="preserve"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -25,14 +25,14 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.2545338"
-     inkscape:cx="361.09032"
-     inkscape:cy="331.19874"
-     inkscape:window-width="1728"
-     inkscape:window-height="1056"
-     inkscape:window-x="0"
-     inkscape:window-y="33"
+     inkscape:cx="318.04643"
+     inkscape:cy="503.7728"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1" /><defs
+     inkscape:current-layer="g38" /><defs
      id="defs1"><rect
        x="230.91457"
        y="416.53009"
@@ -927,7 +927,7 @@
        inkscape:label="front url"><tspan
          x="311.71875"
          y="591.8125"
-         id="tspan7">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><text
+         id="tspan63">GITHUB.COM/FREDSA/APPLE-II-FLUXDOCTOR</tspan></text><text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,-10.953716,-25.132245)"
        id="text84"
@@ -935,10 +935,10 @@
        inkscape:label="request for feedback"><tspan
          x="311.71875"
          y="591.8125"
-         id="tspan14">THE AUTHOR OF THIS </tspan><tspan
+         id="tspan64">THE AUTHOR OF THIS </tspan><tspan
          x="311.71875"
          y="601.8125"
-         id="tspan41">PROGRAM REQUESTS YOUR </tspan><tspan
+         id="tspan65">PROGRAM REQUESTS YOUR </tspan><tspan
          x="311.71875"
          y="611.8125"
          id="tspan66">FEEDBACK.
@@ -963,25 +963,25 @@
        inkscape:label="front-version-serial"
        x="822.54883"
        y="0"><tspan
-         x="421.89062"
+         x="429.89062"
          y="801.1875"
          id="tspan72"><tspan
            style="text-align:end;text-anchor:end"
            id="tspan71">
 </tspan></tspan><tspan
-         x="333.89062"
+         x="341.89062"
          y="811.1875"
          id="tspan74"><tspan
            style="text-align:end;text-anchor:end"
-           id="tspan73">VERSION 1.3
+           id="tspan73">VERSION 1.4
 </tspan></tspan><tspan
-         x="421.89062"
+         x="429.89062"
          y="821.1875"
          id="tspan76"><tspan
            style="text-align:end;text-anchor:end"
            id="tspan75">
 </tspan></tspan><tspan
-         x="373.89062"
+         x="381.89062"
          y="831.1875"
          id="tspan78"><tspan
            style="text-align:end;text-anchor:end"
@@ -1102,13 +1102,13 @@
        inkscape:label="inside version"
        x="822.54883"
        y="0"><tspan
-         x="421.89062"
+         x="429.89062"
          y="801.1875"
          id="tspan102"><tspan
            style="text-align:end;text-anchor:end"
            id="tspan101">
 </tspan></tspan><tspan
-         x="333.89062"
+         x="341.89062"
          y="811.1875"
          id="tspan104"><tspan
            style="text-align:end;text-anchor:end"
@@ -1176,7 +1176,7 @@
          id="tspan105">BASIC INSTRUCTIONS: Insert &amp; rewind tape, type </tspan><tspan
          x="311.71875"
          y="601.8125"
-         id="tspan106">LOAD and press ENTER, then press PLAY.
+         id="tspan106">LOAD and press RETURN, then press PLAY.
 </tspan><tspan
          x="311.71875"
          y="611.8125"
@@ -1204,25 +1204,25 @@
        inkscape:label="front-version-serial"
        x="822.54883"
        y="0"><tspan
-         x="421.89062"
+         x="429.89062"
          y="801.1875"
          id="tspan114"><tspan
            style="text-align:end;text-anchor:end"
            id="tspan113">
 </tspan></tspan><tspan
-         x="333.89062"
+         x="341.89062"
          y="811.1875"
          id="tspan116"><tspan
            style="text-align:end;text-anchor:end"
-           id="tspan115">VERSION 1.3
+           id="tspan115">VERSION 1.4
 </tspan></tspan><tspan
-         x="421.89062"
+         x="429.89062"
          y="821.1875"
          id="tspan118"><tspan
            style="text-align:end;text-anchor:end"
            id="tspan117">
 </tspan></tspan><tspan
-         x="373.89062"
+         x="381.89062"
          y="831.1875"
          id="tspan120"><tspan
            style="text-align:end;text-anchor:end"
