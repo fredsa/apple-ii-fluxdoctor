@@ -1,7 +1,7 @@
 # **`FLUXDOCTOR`** V1.3 for Apple II computers
 
 Diagnostic utility for real-time troubleshooting, calibration, and repair of
-Apple II floppy disks drives. Runs natively on Apple II computer hardware.
+Apple II floppy disks drives. Runs natively on Apple II computers hardware.
 
 <img width="50%" height="50%" src="fluxdoctor.png">
 
@@ -14,6 +14,7 @@ Apple II floppy disks drives. Runs natively on Apple II computer hardware.
 - Exposes weak reads and subtle intermittent errors hidden by DOS
 - Distinguishes seek, checksum, and sector prologue/epilogue errors
 - Can be used to diagnose poorly written or misaligned floppy disk drives
+- Supports 20KB, 24KB, 32KB, 36KB and 48KB systems
 
 ## Available formats
 

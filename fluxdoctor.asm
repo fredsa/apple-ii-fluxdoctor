@@ -328,22 +328,36 @@ pgmstart
 ; notprodos
 
             ; DOS 3.3 relocation with different amounts of RAM
-            ; 48KB  $03D0: JMP 9DBF; JMP 9D84; $AA6A=06 $AA68=01
-            ; 32KB  $03D0: JMP 5DBF; JMP 5D84; $6A6A=06 $6A68=01
-            ; 16KB  $03D0: JMP 1DBF; JMP 1D84; $2A6A=06 $2A68=01
-            lda  $03D2        ; DOS 3.3 $03D0 JMP $9Dxx
+            ; Assumes `MASTER` disk, created by `MASTER CREATE`
+            ;
+            ; Supported configurations:
+            ; - 48KB  $03D0: JMP 9DBF; JMP 9D84; $AA6A=06 $AA68=01
+            ; - 36KB  $03D0: JMP 5DBF; JMP 5D84; $6A6A=06 $6A68=01
+            ; - 32KB  $03D0: JMP 5DBF; JMP 5D84; $6A6A=06 $6A68=01
+            ; - 24KB  $03D0: JMP 3DBF; JMP 3D84; $4A6A=06 $4A68=01
+            ; - 20KB  $03D0: JMP 3DBF; JMP 3D84; $3A6A=06 $3A68=01
+            ;
+            ; `PROGRAM TOO LARGE` error:
+            ; - 16KB  $03D0: JMP 1DBF; JMP 1D84; $2A6A=06 $2A68=01
+            ;
+            ; Insufficent for DOS 3.3:
+            ; - 12KB
+            ; - 8KB
+            ; - 4KB
+
+            lda  $03D2        ; DOS 3.3 $03D0 JMP $xxBF
             and  #$0f
-            cmp  #$0d         ; 9D/5D/1D
+            cmp  #$0d         ; 9D/5D/3D/1D
             bne  notdos33
-            lda  $03D5        ; DOS 3.3 $03D3 JMP $9Dxx
+            lda  $03D5        ; DOS 3.3 $03D3 JMP $xx84
             and  #$0f
-            cmp  #$0d         ; 9D/5D/1D
+            cmp  #$0d         ; 9D/5D/3D/1D
             bne  notdos33
-            lda  $03D2        ; DOS 3.3 $03D0 JMP $9Dxx
-            and  #$f0         ; 9D/5D/1D -> 90/50/10
-            ora  #$0a         ; 90/50/10 -> 9A/5A/1A
+            lda  $03D2        ; DOS 3.3 $03D0 JMP $xxBF
+            and  #$f0         ; 9D/5D/3D/1D -> 90/50/30/10
+            ora  #$0a         ; 90/50/30/10 -> 9A/5A/31/1A
             clc
-            adc  #$10         ; 9A/5A/1A -> AA/6A/2A
+            adc  #$10         ; 9A/5A/3A/1A -> AA/6A/4A/2A
             sta  PTRH
             lda  #$00
             sta  PTRL
