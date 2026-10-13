@@ -97,12 +97,12 @@ DISK_TRACK  equ  $0302
 ; $0C00 - $1FFF - Free Space for Machine Language, Shapes, etc.
 
 ; $2000 - $3FFF -  High Resolution Graphics Page 1
+DISK_BUFFER equ  $2000 ; $c00-$cff 256 bytes
+MAP_6AND2   equ  $2100 ; $d00-$dff 256 bytes
 
 ; $4000 - $5FFF -  High Resolution Graphics Page 2
 
 ; $6000 - $95FF -  Applesoft String Data
-DISK_BUFFER equ  $6000 ; $c00-$cff 256 bytes
-MAP_6AND2   equ  $6100 ; $d00-$dff 256 bytes
 
 ; --------------------------------------------------
 ; ROM routines
@@ -330,20 +330,21 @@ pgmstart
             ; DOS 3.3 relocation with different amounts of RAM
             ; Assumes `MASTER` disk, created by `MASTER CREATE`
             ;
-            ; Supported configurations:
-            ; - 48KB  $03D0: JMP 9DBF; JMP 9D84; $AA6A=06 $AA68=01
-            ; - 36KB  $03D0: JMP 5DBF; JMP 5D84; $6A6A=06 $6A68=01
-            ; - 32KB  $03D0: JMP 5DBF; JMP 5D84; $6A6A=06 $6A68=01
-            ; - 24KB  $03D0: JMP 3DBF; JMP 3D84; $4A6A=06 $4A68=01
-            ; - 20KB  $03D0: JMP 3DBF; JMP 3D84; $3A6A=06 $3A68=01
-            ;
-            ; `PROGRAM TOO LARGE` error:
-            ; - 16KB  $03D0: JMP 1DBF; JMP 1D84; $2A6A=06 $2A68=01
-            ;
-            ; Insufficent for DOS 3.3:
-            ; - 12KB
-            ; - 8KB
-            ; - 4KB
+
+; Supported configurations:
+; - 48KB ($0000–$BFFF)  $03D0: JMP 9DBF, JMP 9D84;  $AA6A=06 $AA68=01
+; - 36KB ($0000–$8FFF)  $03D0: JMP 5DBF, JMP 5D84;  $6A6A=06 $6A68=01
+; - 32KB ($0000–$7FFF)  $03D0: JMP 5DBF, JMP 5D84;  $6A6A=06 $6A68=01
+; - 24KB ($0000–$5FFF)  $03D0: JMP 3DBF, JMP 3D84;  $4A6A=06 $4A68=01
+; - 20KB ($0000–$4FFF)  $03D0: JMP 3DBF, JMP 3D84;  $3A6A=06 $3A68=01
+;
+; `PROGRAM TOO LARGE` error:
+; - 16KB ($0000–$3FFF)  $03D0: JMP 1DBF, JMP 1D84;  $2A6A=06 $2A68=01
+;
+; Insufficent for DOS 3.3:
+; - 12KB ($0000–$2FFF)
+; -  8KB ($0000–$1FFF)
+; -  4KB ($0000–$0FFF)
 
             lda  $03D2        ; DOS 3.3 $03D0 JMP $xxBF
             and  #$0f
