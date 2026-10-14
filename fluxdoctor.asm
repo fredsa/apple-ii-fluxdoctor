@@ -97,8 +97,7 @@ DISK_TRACK  equ  $0302
 ; $0C00 - $1FFF - Free Space for Machine Language, Shapes, etc.
 
 ; $2000 - $3FFF -  High Resolution Graphics Page 1
-DISK_BUFFER equ  $2000 ; $c00-$cff 256 bytes
-MAP_6AND2   equ  $2100 ; $d00-$dff 256 bytes
+MAP_6AND2   equ  $2000 ; $2000-$20ff 256 bytes
 
 ; $4000 - $5FFF -  High Resolution Graphics Page 2
 
