@@ -224,22 +224,6 @@ text_row_17 equ  $7d0
 ; --------------------------------------------------
 ; Macros
 ; --------------------------------------------------
-            mac  print
-.strname    equ  {1}
-            lda  #<.strname
-            sta  PTRL
-            lda  #>.strname
-            sta  PTRH
-            ldy  #$ff
-.next       iny
-            lda  (PTRL),y
-            beq  .done
-            ora  #$80
-            jsr  COUT
-            jmp  .next
-.done
-            endm
-
             mac  printmessage
 .addr       equ  {1}
             ldx  <#.addr
