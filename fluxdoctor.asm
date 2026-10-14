@@ -1068,7 +1068,7 @@ showfound
             renderhex FOUND_VOLUME,VOLUME_ADDR
             renderhex FOUND_TRACK,TRACK_ADDR
             renderhex FOUND_SECTOR,SECTOR_ADDR
-            renderhex CALC_CHKSUM,CHKSUM_ADDR
+            renderhex FOUND_CHECKSUM,CHKSUM_ADDR
             lda  FOUND_SECTOR
             jsr  touchsect
             rts
