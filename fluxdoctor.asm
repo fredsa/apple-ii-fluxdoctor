@@ -1021,7 +1021,6 @@ touchsect   and  #$0f         ; TODO report bad sector > $0f
             asl
             tax
             lda  hexchars,y
-            and  #$bf
             cmp  touchsect_addr,x
             bne  endtouchsect
             eor  #$80
