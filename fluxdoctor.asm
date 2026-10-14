@@ -361,14 +361,26 @@ pgmstart
             sta  PTRL
             ldy  #$6a
             lda  (PTRL),y
-            asl
+            cmp  #1
+            bcs  slotmin
+            lda  #1
+slotmin     cmp  #7 + 1
+            bcc  slotmax
+            lda  #7
+slotmax     asl
             asl
             asl
             asl
             sta  DISK_SLOT
             ldy  #$68
             lda  (PTRL),y
-            sta  DISK_DRIVE
+            cmp  #1
+            bcs  drivemin
+            lda  #1
+drivemin    cmp  #2 + 1
+            bcc  drivemax
+            lda  #2
+drivemax    sta  DISK_DRIVE
             jmp  endprevdevice
 
 
