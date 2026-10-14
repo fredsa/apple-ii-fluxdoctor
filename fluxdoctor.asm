@@ -269,12 +269,10 @@ text_row_17 equ  $7d0
 .val        equ  {1}
 .addr       equ  {2}
             lda  .val
-            clc
-            ror
-            ror
-            ror
-            ror
-            and  #$0f
+            lsr
+            lsr
+            lsr
+            lsr
             tay
             lda  hexchars,y
             and  #$3f
