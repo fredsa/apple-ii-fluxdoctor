@@ -144,9 +144,9 @@ KBDSTRB     equ  $C010
 PHASEOFF    equ  $C080 ; ($Cx80 slot 1-7) Stepper motor phase 0 off
 ;PHASEON     equ  $C081 ; ($Cx81 slot 1-7) Stepper motor phase 0 on
 ;PHASE1OFF   equ  $C082 ; ($Cx82 slot 1-7) Stepper motor phase 1 off
-;PHASElON    equ  $C083 ; ($Cx83 slot 1-7) Stepper motor phase I on
+;PHASE1ON    equ  $C083 ; ($Cx83 slot 1-7) Stepper motor phase 1 on
 ;PHASE2OFF   equ  $C084 ; ($Cx84 slot 1-7) Stepper motor phase 2 off
-;PHASE2ON    equ  $C085 ; ($Cx85 slot 1-7) Stepper notor phase 2 on
+;PHASE2ON    equ  $C085 ; ($Cx85 slot 1-7) Stepper motor phase 2 on
 ;PHASE3OFF   equ  $C086 ; ($Cx86 slot 1-7) Stepper motor phase 3 off
 ;PHASE3ON    equ  $C087 ; ($Cx87 slot 1-7) Stepper motor phase 3 on
 MOTOROFF    equ  $C088 ; ($Cx88 slot 1-7) Turn motor off
@@ -337,7 +337,7 @@ pgmstart
             bne  notdos33
             lda  $03D2        ; DOS 3.3 $03D0 JMP $xxBF
             and  #$f0         ; 9D/5D/3D/1D -> 90/50/30/10
-            ora  #$0a         ; 90/50/30/10 -> 9A/5A/31/1A
+            ora  #$0a         ; 90/50/30/10 -> 9A/5A/3A/1A
             clc
             adc  #$10         ; 9A/5A/3A/1A -> AA/6A/4A/2A
             sta  PTRH
@@ -1263,7 +1263,8 @@ M_MESSAGE_OK
 
 M_KEYBOARD_SHORTCUTS
             byte $0f,$00 ; ypos, xpos
-            byte "========================================",13
+            byte "========================================"
+            byte 13
             byte 'H|$80,"ELP   "
             byte "DRIVE ",'1|$80," ",'2|$80
             byte "      TRACK ",'<|$80,'-|$80," ",'-|$80,'>|$80,"   ",'0|$80," 3",'4|$80
