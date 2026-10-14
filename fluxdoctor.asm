@@ -750,6 +750,7 @@ noesc
             jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
+            jsr  showwp
             jmp  nokey
 nomotoron
 
@@ -778,6 +779,7 @@ nomotoroff
             jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
+            jsr  showwp
             jmp  nokey
 nodrive1
 
@@ -797,6 +799,7 @@ nodrive1
             jsr  motorspinup
             lda  #CODE_Y
             sta  RUNNING
+            jsr  showwp
             jmp  nokey
 nodrive2
 
@@ -847,6 +850,7 @@ askslotmotoron
             lda  #CODE_Y
             sta  RUNNING
             lda  Q7L,x        ; ensure read mode
+            jsr  showwp
 noslotchange
             printmessage M_MESSAGE_OK
             rts
