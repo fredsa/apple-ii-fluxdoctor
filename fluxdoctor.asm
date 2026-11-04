@@ -63,6 +63,7 @@ HELP_SCREEN equ $09
 DRIVNO      equ  $1D
 
 ; $CE-$CF - Free Space
+HELPCOUNTDOWN equ $CE
 
 ; $D7     - Free Space
 TEMP1       equ  $D7
@@ -283,6 +284,12 @@ pgmstart
             sta  RUNNING
 
             ; --------------------------------------------------
+            ; Clear help countdown timer
+            ; --------------------------------------------------
+            lda  #255
+            sta  HELPCOUNTDOWN
+
+            ; --------------------------------------------------
             ; Clear screen
             ; --------------------------------------------------
             jsr  HOME
@@ -451,6 +458,15 @@ noexit
             tax
             lda  spinnerchars,x
             sta  SPINNER_ADDR
+
+            bit  SPINNER
+            bne  nohelpmessage
+            lda  HELPCOUNTDOWN
+            beq  nohelpmessage
+            dec  HELPCOUNTDOWN
+            bne  nohelpmessage
+            printmessageinv M_MESSAGE_H_FOR_HELP
+nohelpmessage
 
             ; --------------------------------------------------
             ; Handle input
@@ -1250,6 +1266,10 @@ DATA_FIELD_ERR_ADDR_K equ text_row_0b+38
 DATA_FIELD_ERR_ADDR_E equ text_row_0b+39
 
 MESSAGE_YPOS equ $08
+
+M_MESSAGE_H_FOR_HELP
+            byte MESSAGE_YPOS, $00 ; ypos, xpos
+            byte "  NEW TO FLUXDOCTOR?  PRESS ",'H|$80," FOR HELP  ",0
 
 M_MESSAGE_ASK_SLOT
             byte MESSAGE_YPOS, $00 ; ypos, xpos
