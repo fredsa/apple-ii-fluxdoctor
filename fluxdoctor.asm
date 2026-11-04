@@ -1405,10 +1405,14 @@ M_HELP4
             byte $00,$0b ; ypos, xpos
             byte "ERROR FLAGS",13
             byte 13
-            byte "1. ",ERR_CODE_SEEK|$80,"EEK ERROR / UNEXPECTED TRACK",13,13
-            byte "2. ",ERR_CODE_MISSING|$80,"ISSING ADDRESS OR DATA FIELD",13,13
-            byte "3. INVALID CHEC",ERR_CODE_CHECKSUM|$80,"SUM",13,13
-            byte "4. INVALID ",ERR_CODE_EPILOGUE|$80,"PILOGUE, BAD BYTE(S)",0
+            byte "FLUXDOCTOR CAN REPORT THE FOLLOWING",13
+            byte "ERROR FLAGS:",13
+            byte 13
+            byte 13
+            byte "   ",ERR_CODE_SEEK|$80,"  ",ERR_CODE_SEEK|$80,"EEK ERROR (UNEXPECTED TRACK)",13,13
+            byte "   ",ERR_CODE_MISSING|$80,"  ",ERR_CODE_MISSING|$80,"ISSING ADDRESS OR DATA FIELD",13,13
+            byte "   ",ERR_CODE_CHECKSUM|$80,"  INVALID CHEC",ERR_CODE_CHECKSUM|$80,"SUM",13,13
+            byte "   ",ERR_CODE_EPILOGUE|$80,"  INVALID ",ERR_CODE_EPILOGUE|$80,"PILOGUE, BAD BYTE(S)",0
 
 M_HELP5
             byte $00,$0b ; ypos, xpos
