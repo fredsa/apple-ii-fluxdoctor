@@ -130,7 +130,7 @@ rm -f out/fluxdoctor-basic.bin
 rm -f out/fluxdoctor-basic.wav
 rm -f out/fluxdoctor-insta-disk.wav
 rm -f out/fluxdoctor-basic.mon
-  
+
 echo
 echo "====================================================================="
 echo "Compiling tape:"

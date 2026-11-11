@@ -1,7 +1,7 @@
 # **`FLUXDOCTOR`** V1.4 for Apple II computers
 
 Diagnostic utility for real-time troubleshooting, calibration, and repair of
-Apple II floppy disks drives. Runs natively on Apple II computers hardware.
+Apple II floppy disks drives. Runs natively on Apple II family computers.
 
 <img width="50%" height="50%" src="fluxdoctor.png">
 
@@ -83,7 +83,7 @@ https://asciiexpress.net/, you can write a new FLUXDOCTOR disk, even if you
 don't (yet) have a bootable floppy disk.
 
 Simply:
-1. Connect your phone or laptop via an audio cable to the Apple II tape in port.
+1. Connect your phone or laptop via an audio cable to the Apple II tape in port
 2. Insert a blank disk into drive 1 (slot 6)
 3. Type `LOAD` on the Apple II
 4. Play the audio file: `fluxdoctor-insta-disk-1.4.wav`
