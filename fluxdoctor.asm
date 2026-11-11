@@ -75,6 +75,7 @@ SPINNER     equ  $E3
 SAVEX       equ  $EB
 PTRL        equ  $EC
 PTRH        equ  $ED
+SAVEXSECT   equ  $EE
 
 ; $FA-$FE - Free Space
 FOUND_HDR   equ  $FA  ; $FA-FD 4 bytes
@@ -1002,11 +1003,18 @@ resetscreen
             renderhex DISK_TRACK,TARGET_TRACK_ADDR
 clearsect   ldy  #15
 clearsectloop
+            lda  sects_appledos,y
+            tax
             tya
             asl
-            tax
-            lda  #'_ | $80
-            sta  touchsect_addr,x
+            tay
+            txa
+            lda  hexchars,x
+            ora  #$80
+            sta  touchsect_addr,y
+            tya
+            lsr
+            tay
             dey
             bpl  clearsectloop
 endclearsect
@@ -1026,19 +1034,14 @@ endclearsect
 
 
 touchsect   and  #$0f         ; TODO report bad sector > $0f
-            tax
-            tay
-            lda  sects_appledos,y
-            tay
-            txa
             asl
-            tax
-            lda  hexchars,y
-            cmp  touchsect_addr,x
-            bne  endtouchsect
-            eor  #$80
-endtouchsect
-            sta  touchsect_addr,x
+            tay
+            ldx  SAVEXSECT
+            sty  SAVEXSECT
+            lda  #' |$80
+            sta  touchsect2_addr,x
+            lda  #'^|$80
+            sta touchsect2_addr,y
             rts
 
 
@@ -1248,6 +1251,7 @@ SECTOR_ADDR equ  text_row_04+29
 CHKSUM_ADDR equ  text_row_04+38
 
 touchsect_addr equ text_row_06+5
+touchsect2_addr equ text_row_07+5
 
 M_DATA_CHECKSUM
             byte $0a,$00 ; ypos, xpos
