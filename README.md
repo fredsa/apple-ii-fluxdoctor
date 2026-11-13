@@ -3,6 +3,8 @@
 Diagnostic utility for real-time troubleshooting, calibration, and repair of
 Apple II floppy disks drives. Runs natively on Apple II family computers.
 
+Download manual: <a href="FLUXDOCTOR-manual-1.4.pdf">FLUXDOCTOR-manual-1.4.pdf</a>
+
 <img width="50%" height="50%" src="fluxdoctor.png">
 
 ## Features
